@@ -6,7 +6,11 @@ plugins {
 }
 
 forgix {
-    autoRun = true
-
     archiveBaseName = "${mod_id}-merged-${minecraft_version}"
+
+    fabric()
+
+    forge()
+
+    autoRun = true
 }
