@@ -43,6 +43,8 @@ public class DisenchantingTableTile extends BaseContainerBlockEntity implements 
 
   private NonNullList<ItemStack> items;
 
+  public int time;
+
   public DisenchantingTableTile(BlockPos pos, BlockState blockState) {
     super(ModTiles.DISENCHANTING_TABLE, pos, blockState);
 
@@ -67,7 +69,7 @@ public class DisenchantingTableTile extends BaseContainerBlockEntity implements 
   }
 
   public static void tickClient(Level level, BlockPos pos, BlockState state, DisenchantingTableTile tile) {
-
+    tile.time++;
   }
 
   public static void tickServer(Level level, BlockPos pos, BlockState state, DisenchantingTableTile tile) {

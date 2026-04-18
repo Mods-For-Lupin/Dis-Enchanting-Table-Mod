@@ -1,9 +1,14 @@
 package io.github.jason13official.disenchanting_table;
 
 import io.github.jason13official.disenchanting_table.impl.client.gui.screens.inventory.DisEnchantingTableScreen;
+import io.github.jason13official.disenchanting_table.impl.client.renderer.blockentity.DisEnchantingTableTileRenderer;
+import io.github.jason13official.disenchanting_table.impl.client.renderer.blockentity.DisEnchantingTableTileRenderer.CrystalModel;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModMenus;
+import io.github.jason13official.disenchanting_table.impl.common.registry.ModTiles;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
 public class DisEnchantingTableClientFabric implements ClientModInitializer {
 
@@ -13,5 +18,9 @@ public class DisEnchantingTableClientFabric implements ClientModInitializer {
     DisEnchantingTableClient.init();
 
     MenuScreens.register(ModMenus.DISENCHANTING_TABLE, DisEnchantingTableScreen::new);
+
+    BlockEntityRenderers.register(ModTiles.DISENCHANTING_TABLE, DisEnchantingTableTileRenderer::new);
+
+    EntityModelLayerRegistry.registerModelLayer(CrystalModel.LAYER_LOCATION, CrystalModel::createBodyLayer);
   }
 }
