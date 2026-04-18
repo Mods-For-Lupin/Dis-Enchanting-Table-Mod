@@ -26,12 +26,6 @@ public class DisEnchantingTableScreen extends AbstractContainerScreen<DisEnchant
     this.inventoryLabelY = -100;
   }
 
-  /// maybe not needed? original resize clears and rebuilds widgets as a side effect
-  @Override
-  public void resize(Minecraft minecraft, int width, int height) {
-    init();
-  }
-
   @Override
   protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
     guiGraphics.blit(BACKGROUND, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);

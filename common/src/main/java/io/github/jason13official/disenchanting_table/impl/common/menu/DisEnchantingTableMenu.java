@@ -1,6 +1,8 @@
 package io.github.jason13official.disenchanting_table.impl.common.menu;
 
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisenchantingTableTile;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModMenus;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -32,6 +34,42 @@ public class DisEnchantingTableMenu extends AbstractContainerMenu {
     this.container = container;
     this.data = data;
     this.level = inventory.player.level();
+
+    this.addSlot(new Slot(container, DisenchantingTableTile.INPUT_SLOT, 27, 47) {
+
+      @Override
+      public boolean mayPlace(ItemStack stack) {
+        return DisEnchantingTableMenu.canPlaceItem(DisenchantingTableTile.INPUT_SLOT, stack);
+      }
+    });
+    this.addSlot(new Slot(container, DisenchantingTableTile.EXTRA_SLOT, 76, 47) {
+
+      @Override
+      public boolean mayPlace(ItemStack stack) {
+        return DisEnchantingTableMenu.canPlaceItem(DisenchantingTableTile.EXTRA_SLOT, stack);
+      }
+    });
+    this.addSlot(new Slot(container, DisenchantingTableTile.OUTPUT_SLOT, 134, 47) {
+
+      @Override
+      public boolean mayPlace(ItemStack stack) {
+        return DisEnchantingTableMenu.canPlaceItem(DisenchantingTableTile.OUTPUT_SLOT, stack);
+      }
+    });
+
+    this.createInventorySlots(inventory);
+  }
+
+  private void createInventorySlots(Inventory inventory) {
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 9; ++j) {
+        this.addSlot(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+      }
+    }
+
+    for (int k = 0; k < 9; ++k) {
+      this.addSlot(new Slot(inventory, k, 8 + k * 18, 142));
+    }
   }
 
   @Override
@@ -52,11 +90,20 @@ public class DisEnchantingTableMenu extends AbstractContainerMenu {
 //  }
 
   /// return true if more than 1 enchantment or normal item with any enchantments
-  boolean mayDisenchant(ItemStack stack) {
+  public static boolean mayDisenchant(ItemStack stack) {
     int count = EnchantmentHelper.getEnchantments(stack).size();
     return count > 1 || (!(stack.getItem() instanceof EnchantedBookItem) && count > 0);
   }
 
+  public static boolean canPlaceItem(int slot, ItemStack stack) {
+    if (slot == DisenchantingTableTile.INPUT_SLOT && DisEnchantingTableMenu.mayDisenchant(stack)) {
+      return true;
+    }
+
+    return slot == DisenchantingTableTile.EXTRA_SLOT && stack.getItem() instanceof BookItem;
+  }
+
+  // adapted from AbstractFurnaceMenu I think bc we have same amount of slots and i'm lazy
   public ItemStack quickMoveStack(Player player, int index) {
     ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = this.slots.get(index);
