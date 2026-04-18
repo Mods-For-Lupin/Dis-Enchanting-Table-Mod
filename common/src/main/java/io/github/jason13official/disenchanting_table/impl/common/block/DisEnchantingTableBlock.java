@@ -1,16 +1,12 @@
 package io.github.jason13official.disenchanting_table.impl.common.block;
 
-import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisenchantingTableTile;
-import io.github.jason13official.disenchanting_table.impl.common.menu.DisEnchantingTableMenu;
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModTiles;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -50,7 +46,7 @@ public class DisEnchantingTableBlock extends Block implements EntityBlock {
 
       BlockEntity tile = level.getBlockEntity(pos);
 
-      if (tile instanceof DisenchantingTableTile table) {
+      if (tile instanceof DisEnchantingTableTile table) {
         player.openMenu((MenuProvider) table);
       }
 
@@ -60,7 +56,7 @@ public class DisEnchantingTableBlock extends Block implements EntityBlock {
 
   @Override
   public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-    return new DisenchantingTableTile(blockPos, blockState);
+    return new DisEnchantingTableTile(blockPos, blockState);
   }
 
   @Override
@@ -75,7 +71,7 @@ public class DisEnchantingTableBlock extends Block implements EntityBlock {
 
   @Override
   public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> blockEntityType) {
-    return level.isClientSide ? createTickerHelper(blockEntityType, ModTiles.DISENCHANTING_TABLE, DisenchantingTableTile::tickClient)
-        : createTickerHelper(blockEntityType, ModTiles.DISENCHANTING_TABLE, DisenchantingTableTile::tickServer);
+    return level.isClientSide ? createTickerHelper(blockEntityType, ModTiles.DISENCHANTING_TABLE, DisEnchantingTableTile::tickClient)
+        : createTickerHelper(blockEntityType, ModTiles.DISENCHANTING_TABLE, DisEnchantingTableTile::tickServer);
   }
 }

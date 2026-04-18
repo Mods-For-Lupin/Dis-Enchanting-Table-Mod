@@ -17,15 +17,13 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.BookItem;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class DisenchantingTableTile extends BaseContainerBlockEntity implements WorldlyContainer {
+public class DisEnchantingTableTile extends BaseContainerBlockEntity implements WorldlyContainer {
 
   public static final int INPUT_SLOT = 0;
   public static final int EXTRA_SLOT = 1;
@@ -49,7 +47,7 @@ public class DisenchantingTableTile extends BaseContainerBlockEntity implements 
   public float open;
   public float oOpen;
 
-  public DisenchantingTableTile(BlockPos pos, BlockState blockState) {
+  public DisEnchantingTableTile(BlockPos pos, BlockState blockState) {
     super(ModTiles.DISENCHANTING_TABLE, pos, blockState);
 
     this.items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
@@ -72,14 +70,14 @@ public class DisenchantingTableTile extends BaseContainerBlockEntity implements 
     };
   }
 
-  public static void tickClient(Level level, BlockPos pos, BlockState state, DisenchantingTableTile tile) {
+  public static void tickClient(Level level, BlockPos pos, BlockState state, DisEnchantingTableTile tile) {
     tile.oOpen = tile.open;
     Player player = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 3.0, false);
     tile.open = Mth.clamp(tile.open + (player != null ? 0.1F : -0.1F), 0.0F, 1.0F);
     tile.time++;
   }
 
-  public static void tickServer(Level level, BlockPos pos, BlockState state, DisenchantingTableTile tile) {
+  public static void tickServer(Level level, BlockPos pos, BlockState state, DisEnchantingTableTile tile) {
 
   }
 

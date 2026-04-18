@@ -1,8 +1,7 @@
 package io.github.jason13official.disenchanting_table.impl.common.menu;
 
-import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisenchantingTableTile;
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModMenus;
-import net.minecraft.core.NonNullList;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -17,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 
+/// provides access to the container ([DisEnchantingTableTile])
 public class DisEnchantingTableMenu extends AbstractContainerMenu {
 
   private final Container container;
@@ -35,25 +35,25 @@ public class DisEnchantingTableMenu extends AbstractContainerMenu {
     this.data = data;
     this.level = inventory.player.level();
 
-    this.addSlot(new Slot(container, DisenchantingTableTile.INPUT_SLOT, 27, 47) {
+    this.addSlot(new Slot(container, DisEnchantingTableTile.INPUT_SLOT, 27, 47) {
 
       @Override
       public boolean mayPlace(ItemStack stack) {
-        return DisEnchantingTableMenu.canPlaceItem(DisenchantingTableTile.INPUT_SLOT, stack);
+        return DisEnchantingTableMenu.canPlaceItem(DisEnchantingTableTile.INPUT_SLOT, stack);
       }
     });
-    this.addSlot(new Slot(container, DisenchantingTableTile.EXTRA_SLOT, 76, 47) {
+    this.addSlot(new Slot(container, DisEnchantingTableTile.EXTRA_SLOT, 76, 47) {
 
       @Override
       public boolean mayPlace(ItemStack stack) {
-        return DisEnchantingTableMenu.canPlaceItem(DisenchantingTableTile.EXTRA_SLOT, stack);
+        return DisEnchantingTableMenu.canPlaceItem(DisEnchantingTableTile.EXTRA_SLOT, stack);
       }
     });
-    this.addSlot(new Slot(container, DisenchantingTableTile.OUTPUT_SLOT, 134, 47) {
+    this.addSlot(new Slot(container, DisEnchantingTableTile.OUTPUT_SLOT, 134, 47) {
 
       @Override
       public boolean mayPlace(ItemStack stack) {
-        return DisEnchantingTableMenu.canPlaceItem(DisenchantingTableTile.OUTPUT_SLOT, stack);
+        return DisEnchantingTableMenu.canPlaceItem(DisEnchantingTableTile.OUTPUT_SLOT, stack);
       }
     });
 
@@ -96,11 +96,11 @@ public class DisEnchantingTableMenu extends AbstractContainerMenu {
   }
 
   public static boolean canPlaceItem(int slot, ItemStack stack) {
-    if (slot == DisenchantingTableTile.INPUT_SLOT && DisEnchantingTableMenu.mayDisenchant(stack)) {
+    if (slot == DisEnchantingTableTile.INPUT_SLOT && DisEnchantingTableMenu.mayDisenchant(stack)) {
       return true;
     }
 
-    return slot == DisenchantingTableTile.EXTRA_SLOT && stack.getItem() instanceof BookItem;
+    return slot == DisEnchantingTableTile.EXTRA_SLOT && stack.getItem() instanceof BookItem;
   }
 
   // adapted from AbstractFurnaceMenu I think bc we have same amount of slots and i'm lazy

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.github.jason13official.disenchanting_table.DisEnchantingTable;
-import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisenchantingTableTile;
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 
-public class DisEnchantingTableTileRenderer implements BlockEntityRenderer<DisenchantingTableTile> {
+public class DisEnchantingTableTileRenderer implements BlockEntityRenderer<DisEnchantingTableTile> {
 
   public static final ResourceLocation CRYSTAL_TEXTURE = DisEnchantingTable.identifier("textures/entity/crystal.png");
   private final CrystalModel crystalModel;
@@ -37,7 +37,7 @@ public class DisEnchantingTableTileRenderer implements BlockEntityRenderer<Disen
   }
 
   @Override
-  public void render(DisenchantingTableTile tile, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+  public void render(DisEnchantingTableTile tile, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
     poseStack.pushPose();
 
     float f = (float) tile.time + partialTick;
