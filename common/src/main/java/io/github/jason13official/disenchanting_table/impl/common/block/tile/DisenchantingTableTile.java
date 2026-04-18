@@ -19,6 +19,8 @@ import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,6 +46,8 @@ public class DisenchantingTableTile extends BaseContainerBlockEntity implements 
   private NonNullList<ItemStack> items;
 
   public int time;
+  public float open;
+  public float oOpen;
 
   public DisenchantingTableTile(BlockPos pos, BlockState blockState) {
     super(ModTiles.DISENCHANTING_TABLE, pos, blockState);
@@ -69,6 +73,9 @@ public class DisenchantingTableTile extends BaseContainerBlockEntity implements 
   }
 
   public static void tickClient(Level level, BlockPos pos, BlockState state, DisenchantingTableTile tile) {
+    tile.oOpen = tile.open;
+    Player player = level.getNearestPlayer(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 3.0, false);
+    tile.open = Mth.clamp(tile.open + (player != null ? 0.1F : -0.1F), 0.0F, 1.0F);
     tile.time++;
   }
 

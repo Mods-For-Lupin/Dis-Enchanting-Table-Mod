@@ -29,18 +29,31 @@ public class DisEnchantingTableTileRenderer implements BlockEntityRenderer<Disen
     this.crystalModel = new CrystalModel(context.bakeLayer(CrystalModel.LAYER_LOCATION));
   }
 
+  private static void renderSegment(PoseStack poseStack, VertexConsumer vc, int light, int overlay, ModelPart part, float yOffset) {
+    poseStack.pushPose();
+    poseStack.translate(0, yOffset, 0);
+    part.render(poseStack, vc, light, overlay, 1, 1, 1, 1);
+    poseStack.popPose();
+  }
+
   @Override
   public void render(DisenchantingTableTile tile, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
     poseStack.pushPose();
 
-    float f = (float)tile.time + partialTick;
-    poseStack.translate(0.5F, 1.25F + Mth.sin(f * 0.1F) * 0.1F, 0.5F);
+    float f = (float) tile.time + partialTick;
+    float open = Mth.lerp(partialTick, tile.oOpen, tile.open);
+    // poseStack.translate(0.5F, 1.25F + Mth.sin(f * 0.1F) * 0.1F, 0.5F);
+    poseStack.translate(0.5F, 1.0625f + Mth.sin(f * 0.1F) * 0.1F, 0.5F);
     poseStack.mulPose(Axis.YP.rotation(f * 0.05F));
     poseStack.scale(0.5F, 0.5F, 0.5F);
 
-    this.crystalModel.setupAnim();
     VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entitySolid(CRYSTAL_TEXTURE));
-    this.crystalModel.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay, 1, 1, 1, 1);
+    renderSegment(poseStack, vertexConsumer, packedLight, packedOverlay, crystalModel.topTip, 0.24F * open * (Mth.sin(f * 0.1f) * 0.75f));
+    renderSegment(poseStack, vertexConsumer, packedLight, packedOverlay, crystalModel.top, 0.16F * open * (Mth.sin(f * 0.1f) * 0.75f));
+    renderSegment(poseStack, vertexConsumer, packedLight, packedOverlay, crystalModel.midUpper, 0.08F * open * (Mth.sin(f * 0.1f) * 0.75f));
+    renderSegment(poseStack, vertexConsumer, packedLight, packedOverlay, crystalModel.midLower, -0.08F * open * (Mth.sin(f * 0.1f) * 0.75f));
+    renderSegment(poseStack, vertexConsumer, packedLight, packedOverlay, crystalModel.bottom, -0.16F * open * (Mth.sin(f * 0.1f) * 0.75f));
+    renderSegment(poseStack, vertexConsumer, packedLight, packedOverlay, crystalModel.bottomTip, -0.24F * open * (Mth.sin(f * 0.1f) * 0.75f));
 
     poseStack.popPose();
   }
@@ -48,31 +61,34 @@ public class DisEnchantingTableTileRenderer implements BlockEntityRenderer<Disen
   public static class CrystalModel extends Model {
 
     public static ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(DisEnchantingTable.identifier("crystal"), "main");
-
+    public final ModelPart topTip;
+    public final ModelPart top;
+    public final ModelPart midUpper;
+    public final ModelPart midLower;
+    public final ModelPart bottom;
+    public final ModelPart bottomTip;
     private final ModelPart root;
 
     public CrystalModel(ModelPart root) {
       super(RenderType::entitySolid);
       this.root = root;
+      this.topTip = root.getChild("top_tip");
+      this.top = root.getChild("top");
+      this.midUpper = root.getChild("mid_upper");
+      this.midLower = root.getChild("mid_lower");
+      this.bottom = root.getChild("bottom");
+      this.bottomTip = root.getChild("bottom_tip");
     }
 
     public static LayerDefinition createBodyLayer() {
       MeshDefinition meshDefinition = new MeshDefinition();
       PartDefinition partDefinition = meshDefinition.getRoot();
-      // Stepped Plumbob: tapers from 8-wide middle to points at top/bottom
-      // UV layout calculated per-part to fit 64x32
-      partDefinition.addOrReplaceChild("top_tip",
-          CubeListBuilder.create().texOffs(0, 0).addBox(-1, 6, -1, 2, 2, 2), PartPose.ZERO);
-      partDefinition.addOrReplaceChild("top",
-          CubeListBuilder.create().texOffs(8, 0).addBox(-3, 3, -3, 6, 3, 6), PartPose.ZERO);
-      partDefinition.addOrReplaceChild("mid_upper",
-          CubeListBuilder.create().texOffs(0, 9).addBox(-4, 0, -4, 8, 3, 8), PartPose.ZERO);
-      partDefinition.addOrReplaceChild("mid_lower",
-          CubeListBuilder.create().texOffs(32, 9).addBox(-4, -3, -4, 8, 3, 8), PartPose.ZERO);
-      partDefinition.addOrReplaceChild("bottom",
-          CubeListBuilder.create().texOffs(0, 20).addBox(-3, -6, -3, 6, 3, 6), PartPose.ZERO);
-      partDefinition.addOrReplaceChild("bottom_tip",
-          CubeListBuilder.create().texOffs(24, 20).addBox(-1, -8, -1, 2, 2, 2), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("top_tip", CubeListBuilder.create().texOffs(0, 0).addBox(-1, 6, -1, 2, 2, 2), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("top", CubeListBuilder.create().texOffs(8, 0).addBox(-3, 3, -3, 6, 3, 6), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("mid_upper", CubeListBuilder.create().texOffs(0, 9).addBox(-4, 0, -4, 8, 3, 8), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("mid_lower", CubeListBuilder.create().texOffs(32, 9).addBox(-4, -3, -4, 8, 3, 8), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("bottom", CubeListBuilder.create().texOffs(0, 20).addBox(-3, -6, -3, 6, 3, 6), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("bottom_tip", CubeListBuilder.create().texOffs(24, 20).addBox(-1, -8, -1, 2, 2, 2), PartPose.ZERO);
       return LayerDefinition.create(meshDefinition, 64, 32);
     }
 
@@ -81,6 +97,7 @@ public class DisEnchantingTableTileRenderer implements BlockEntityRenderer<Disen
       this.root.render(poseStack, buffer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 
-    public void setupAnim() {}
+    public void setupAnim() {
+    }
   }
 }
