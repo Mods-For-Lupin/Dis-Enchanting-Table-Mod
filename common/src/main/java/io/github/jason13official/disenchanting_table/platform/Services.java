@@ -18,7 +18,7 @@ public class Services {
   private static IRegistryHelper REGISTRY;
 
   public static IRegistryHelper registry() {
-    if (REGISTRY == null) load(IRegistryHelper.class);
+    if (REGISTRY == null) REGISTRY = load(IRegistryHelper.class);
     return REGISTRY;
   }
 

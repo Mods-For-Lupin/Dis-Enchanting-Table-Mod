@@ -7,6 +7,7 @@ import io.github.jason13official.disenchanting_table.impl.common.registry.ModMen
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModParticles;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModTabs;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModTiles;
+import io.github.jason13official.disenchanting_table.platform.Services;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.minecraft.core.Registry;
@@ -32,6 +33,10 @@ public class DisEnchantingTableForge {
   public static IEventBus EVENT_BUS;
 
   public DisEnchantingTableForge(final FMLJavaModLoadingContext context) {
+
+    // ensure service is loaded during mod initialization
+    // Services.registry();
+
     EVENT_BUS = context.getModEventBus();
 
     bind(Registries.BLOCK, ModBlocks::register);
