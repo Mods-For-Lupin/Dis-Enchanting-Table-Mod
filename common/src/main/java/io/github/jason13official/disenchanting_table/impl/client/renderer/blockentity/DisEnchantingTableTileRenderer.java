@@ -2,6 +2,7 @@ package io.github.jason13official.disenchanting_table.impl.client.renderer.block
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import io.github.jason13official.disenchanting_table.DisEnchantingTable;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisenchantingTableTile;
 import net.minecraft.client.model.Model;
@@ -33,7 +34,9 @@ public class DisEnchantingTableTileRenderer implements BlockEntityRenderer<Disen
     poseStack.pushPose();
 
     float f = (float)tile.time + partialTick;
-    poseStack.translate(0.0F, 0.1F + Mth.sin(f * 0.1F) * 0.01F, 0.0F);
+    poseStack.translate(0.5F, 1.25F + Mth.sin(f * 0.1F) * 0.1F, 0.5F);
+    poseStack.mulPose(Axis.YP.rotation(f * 0.05F));
+    poseStack.scale(0.5F, 0.5F, 0.5F);
 
     this.crystalModel.setupAnim();
     VertexConsumer vertexConsumer = buffer.getBuffer(RenderType.entitySolid(CRYSTAL_TEXTURE));
@@ -47,18 +50,29 @@ public class DisEnchantingTableTileRenderer implements BlockEntityRenderer<Disen
     public static ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(DisEnchantingTable.identifier("crystal"), "main");
 
     private final ModelPart root;
-    private final ModelPart crystal;
 
     public CrystalModel(ModelPart root) {
       super(RenderType::entitySolid);
       this.root = root;
-      this.crystal = root.getChild("crystal");
     }
 
     public static LayerDefinition createBodyLayer() {
       MeshDefinition meshDefinition = new MeshDefinition();
       PartDefinition partDefinition = meshDefinition.getRoot();
-      partDefinition.addOrReplaceChild("crystal", CubeListBuilder.create().texOffs(0, 0).addBox(0, 16.0625f, 0, 16.0f, 16.0f, 16.0f), PartPose.ZERO);
+      // Stepped Plumbob: tapers from 8-wide middle to points at top/bottom
+      // UV layout calculated per-part to fit 64x32
+      partDefinition.addOrReplaceChild("top_tip",
+          CubeListBuilder.create().texOffs(0, 0).addBox(-1, 6, -1, 2, 2, 2), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("top",
+          CubeListBuilder.create().texOffs(8, 0).addBox(-3, 3, -3, 6, 3, 6), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("mid_upper",
+          CubeListBuilder.create().texOffs(0, 9).addBox(-4, 0, -4, 8, 3, 8), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("mid_lower",
+          CubeListBuilder.create().texOffs(32, 9).addBox(-4, -3, -4, 8, 3, 8), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("bottom",
+          CubeListBuilder.create().texOffs(0, 20).addBox(-3, -6, -3, 6, 3, 6), PartPose.ZERO);
+      partDefinition.addOrReplaceChild("bottom_tip",
+          CubeListBuilder.create().texOffs(24, 20).addBox(-1, -8, -1, 2, 2, 2), PartPose.ZERO);
       return LayerDefinition.create(meshDefinition, 64, 32);
     }
 
