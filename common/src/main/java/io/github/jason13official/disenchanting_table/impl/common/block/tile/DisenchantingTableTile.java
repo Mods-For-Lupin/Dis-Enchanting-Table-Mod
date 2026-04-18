@@ -50,7 +50,7 @@ public class DisenchantingTableTile extends BaseContainerBlockEntity implements 
 
   @Override
   protected Component getDefaultName() {
-    return Component.empty();
+    return Component.translatable("itemGroup.disenchantingTable");
   }
 
   @Override
@@ -60,7 +60,7 @@ public class DisenchantingTableTile extends BaseContainerBlockEntity implements 
 
   @Override
   public int getContainerSize() {
-    return 0;
+    return 3;
   }
 
   @Override
@@ -90,7 +90,7 @@ public class DisenchantingTableTile extends BaseContainerBlockEntity implements 
 
   @Override
   public boolean stillValid(Player player) {
-    return false;
+    return !player.isDeadOrDying();
   }
 
   @Override
