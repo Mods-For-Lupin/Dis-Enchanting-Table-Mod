@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.WorldlyContainer;
@@ -117,7 +118,7 @@ public class DisEnchantingTableTile extends BaseContainerBlockEntity implements 
       ItemStack currentOutput = tile.getItem(OUTPUT_SLOT);
       if (!ItemStack.matches(currentOutput, expectedOutput)) {
         tile.items.set(OUTPUT_SLOT, expectedOutput);
-        tile.setChanged();
+        tile.markUpdated();
       }
     }
   }
@@ -152,7 +153,7 @@ public class DisEnchantingTableTile extends BaseContainerBlockEntity implements 
 
     tile.getItem(EXTRA_SLOT).shrink(1);
     tile.items.set(OUTPUT_SLOT, outputBook);
-    tile.setChanged();
+    tile.markUpdated();
   }
 
   /// called by the menu when the player takes from the output slot in manual mode;
@@ -167,7 +168,7 @@ public class DisEnchantingTableTile extends BaseContainerBlockEntity implements 
     if (input.is(Items.ENCHANTED_BOOK)) input.removeTagKey("StoredEnchantments");
     EnchantmentHelper.setEnchantments(enchants, input);
     tile.getItem(EXTRA_SLOT).shrink(1);
-    tile.setChanged();
+    tile.markUpdated();
   }
 
   @Override
@@ -262,8 +263,25 @@ public class DisEnchantingTableTile extends BaseContainerBlockEntity implements 
   @Override
   protected void saveAdditional(CompoundTag tag) {
     super.saveAdditional(tag);
-    ContainerHelper.saveAllItems(tag, this.items);
+    ContainerHelper.saveAllItems(tag, this.items, true);
     tag.putInt("Mode", this.mode);
+  }
+
+  @Override
+  public ClientboundBlockEntityDataPacket getUpdatePacket() {
+    return ClientboundBlockEntityDataPacket.create(this);
+  }
+
+  @Override
+  public CompoundTag getUpdateTag() {
+    CompoundTag tag = new CompoundTag();
+    ContainerHelper.saveAllItems(tag, this.items, true);
+    return tag;
+  }
+
+  private void markUpdated() {
+    this.setChanged();
+    this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
   }
 
   @Override
