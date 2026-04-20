@@ -36,27 +36,34 @@ public class DisEnchantingTableMenu extends AbstractContainerMenu {
     this.level = inventory.player.level();
 
     this.addSlot(new Slot(container, DisEnchantingTableTile.INPUT_SLOT, 27, 47) {
-
       @Override
       public boolean mayPlace(ItemStack stack) {
         return DisEnchantingTableMenu.canPlaceItem(DisEnchantingTableTile.INPUT_SLOT, stack);
       }
     });
     this.addSlot(new Slot(container, DisEnchantingTableTile.EXTRA_SLOT, 76, 47) {
-
       @Override
       public boolean mayPlace(ItemStack stack) {
         return DisEnchantingTableMenu.canPlaceItem(DisEnchantingTableTile.EXTRA_SLOT, stack);
       }
     });
     this.addSlot(new Slot(container, DisEnchantingTableTile.OUTPUT_SLOT, 134, 47) {
-
       @Override
       public boolean mayPlace(ItemStack stack) {
-        return DisEnchantingTableMenu.canPlaceItem(DisEnchantingTableTile.OUTPUT_SLOT, stack);
+        return false;
+      }
+
+      @Override
+      public void onTake(Player player, ItemStack stack) {
+        if (DisEnchantingTableMenu.this.container instanceof DisEnchantingTableTile tile
+            && tile.getMode() == DisEnchantingTableTile.MODE_MANUAL) {
+          DisEnchantingTableTile.consumeForManualTake(tile);
+        }
+        super.onTake(player, stack);
       }
     });
 
+    this.addDataSlots(data);
     this.createInventorySlots(inventory);
   }
 
@@ -77,17 +84,21 @@ public class DisEnchantingTableMenu extends AbstractContainerMenu {
     return !player.isDeadOrDying();
   }
 
-  //  @Override
-//  protected ItemCombinerMenuSlotDefinition createInputSlotDefinitions() {
-//
-//    ItemCombinerMenuSlotDefinition.Builder definition = ItemCombinerMenuSlotDefinition.create();
-//
-//    definition.withSlot(0, 27, 47, this::mayDisenchant); // allow enchanted items or enchanted books with > 1 enchantment
-//    definition.withSlot(1, 76, 47, stack -> stack.getItem() instanceof BookItem); // allow normal books
-//    definition.withResultSlot(2, 134, 47);
-//
-//    return definition.build();
-//  }
+  @Override
+  public boolean clickMenuButton(Player player, int id) {
+    if (id == 0 && this.container instanceof DisEnchantingTableTile tile) {
+      tile.setMode(tile.getMode() == DisEnchantingTableTile.MODE_MANUAL
+          ? DisEnchantingTableTile.MODE_AUTO
+          : DisEnchantingTableTile.MODE_MANUAL);
+      return true;
+    }
+    return false;
+  }
+
+  /// current mode synced from tile via ContainerData[0]
+  public int getMode() {
+    return this.data.get(0);
+  }
 
   /// return true if more than 1 enchantment or normal item with any enchantments
   public static boolean mayDisenchant(ItemStack stack) {
