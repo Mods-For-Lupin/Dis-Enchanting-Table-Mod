@@ -1,5 +1,6 @@
 package io.github.jason13official.disenchanting_table.impl.client.screen;
 
+import io.github.jason13official.disenchanting_table.Constants;
 import io.github.jason13official.disenchanting_table.DisEnchantingTable;
 import io.github.jason13official.disenchanting_table.DisEnchantingTableClient;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisenchantMode;
@@ -37,6 +38,7 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
     this.modeButton = this.addRenderableWidget(Button.builder(
         modeLabel(),
         b -> {
+          Constants.LOG.info("clicked toggle");
           DisEnchantingTableClient.sendModePacket(this.menu.getPos());
           b.setMessage(modeLabel());
         }

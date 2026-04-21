@@ -51,9 +51,11 @@ public class DisEnchantingTableNeoForge {
     EVENT_BUS.addListener((Consumer<RegisterPayloadHandlersEvent>) event -> {
       PayloadRegistrar registrar = event.registrar(Constants.MOD_ID);
       registrar.playToServer(ModePacket.TYPE, ModePacket.STREAM_CODEC, (payload, context) -> {
-        if (context.player().level().getBlockEntity(payload.pos()) instanceof DisEnchantingTableTile tile) {
-          tile.toggleMode();
-        }
+        context.enqueueWork(() ->{
+          if (context.player().level().getBlockEntity(payload.pos()) instanceof DisEnchantingTableTile tile) {
+            tile.toggleMode();
+          }
+        });
       });
     });
 

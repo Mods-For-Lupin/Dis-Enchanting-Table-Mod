@@ -53,7 +53,10 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
     if (this.container instanceof DisEnchantingTableTile tile) {
       var level = tile.getLevel();
       if (level != null && !level.isClientSide() && tile.getMode() == DisenchantMode.MANUAL) {
-        ItemStack expected = tile.canDisenchant() ? tile.buildOutput(tile.getItem(0)) : ItemStack.EMPTY;
+        ItemStack input = tile.getItem(0);
+        ItemStack extra = tile.getItem(1);
+        boolean canProduce = !input.isEmpty() && !extra.isEmpty() && extra.is(Items.BOOK) && tile.isValidInput(input);
+        ItemStack expected = canProduce ? tile.buildOutput(input) : ItemStack.EMPTY;
         if (!ItemStack.matches(tile.getItem(2), expected)) {
           tile.setItem(2, expected);
           tile.setChanged();
