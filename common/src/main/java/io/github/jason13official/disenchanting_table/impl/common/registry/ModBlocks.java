@@ -18,7 +18,7 @@ public class ModBlocks {
   public static Block DISENCHANTING_TABLE;
 
   public static void register(BiConsumer<Block, Identifier> consumer) {
-    
+
     DISENCHANTING_TABLE = create(Constants.MOD_ID, DisEnchantingTableBlock::new, Properties.ofFullCopy(Blocks.ENCHANTING_TABLE).mapColor(MapColor.COLOR_BLUE));
 
     consumer.accept(DISENCHANTING_TABLE, DisEnchantingTable.identifier(Constants.MOD_ID));
