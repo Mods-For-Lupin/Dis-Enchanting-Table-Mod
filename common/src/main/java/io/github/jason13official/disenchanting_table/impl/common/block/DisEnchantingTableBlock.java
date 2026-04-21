@@ -4,7 +4,9 @@ import com.mojang.serialization.MapCodec;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModTiles;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.EnchantingTableBlock;
@@ -14,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 /// [EnchantingTableBlock] [CampfireBlock]
@@ -34,6 +37,22 @@ public class DisEnchantingTableBlock extends DirectionalTableBlock implements En
   @Override
   protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
     return CODEC;
+  }
+
+  @Override
+  protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    if (!level.isClientSide()) {
+      this.openContainer(level, pos, player);
+    }
+
+    return InteractionResult.SUCCESS;
+  }
+
+  protected void openContainer(Level level, BlockPos pos, Player player) {
+    BlockEntity blockEntity = level.getBlockEntity(pos);
+    if (blockEntity instanceof DisEnchantingTableTile) {
+      player.openMenu((MenuProvider) blockEntity);
+    }
   }
 
   @Override
