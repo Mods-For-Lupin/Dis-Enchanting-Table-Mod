@@ -40,7 +40,7 @@ public abstract class AbstractDisEnchantingTile extends BlockEntity implements C
   }
 
   /// mimics [CampfireBlockEntity] so we're ignoring the possible null pointer exception
-  private void markUpdated() {
+  public void markUpdated() {
     this.setChanged();
     this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), Block.UPDATE_ALL);
   }
@@ -94,12 +94,22 @@ public abstract class AbstractDisEnchantingTile extends BlockEntity implements C
 
   @Override
   public boolean canPlaceItemThroughFace(int i, ItemStack itemStack, @Nullable Direction direction) {
-    return true; // TODO update
+    if (i == 2) return false;
+    if (i == 0) {
+      if (itemStack.is(net.minecraft.world.item.Items.ENCHANTED_BOOK)) {
+        return net.minecraft.world.item.enchantment.EnchantmentHelper
+            .getEnchantmentsForCrafting(itemStack).size() >= 2;
+      }
+      return !net.minecraft.world.item.enchantment.EnchantmentHelper
+          .getEnchantmentsForCrafting(itemStack).isEmpty();
+    }
+    if (i == 1) return itemStack.is(net.minecraft.world.item.Items.BOOK);
+    return false;
   }
 
   @Override
   public boolean canTakeItemThroughFace(int i, ItemStack itemStack, Direction direction) {
-    return true; // TODO update
+    return i == 2;
   }
 
   @Override

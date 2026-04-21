@@ -1,5 +1,7 @@
 package io.github.jason13official.disenchanting_table;
 
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
+import io.github.jason13official.disenchanting_table.impl.common.network.ModePacket;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModBlocks;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModEntities;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModItems;
@@ -10,6 +12,8 @@ import io.github.jason13official.disenchanting_table.impl.common.registry.ModTil
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.impl.resource.DataResourceLoaderImpl;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -33,6 +37,13 @@ public class DisEnchantingTableFabric implements ModInitializer {
     bind(BuiltInRegistries.CREATIVE_MODE_TAB, ModTabs::register);
 
     DisEnchantingTable.init();
+
+    PayloadTypeRegistry.serverboundPlay().register(ModePacket.TYPE, ModePacket.STREAM_CODEC);
+    ServerPlayNetworking.registerGlobalReceiver(ModePacket.TYPE, (payload, context) -> {
+      if (context.player().level().getBlockEntity(payload.pos()) instanceof DisEnchantingTableTile tile) {
+        tile.toggleMode();
+      }
+    });
 
     DataResourceLoaderImpl.get(PackType.SERVER_DATA).registerReloadListener(DisEnchantingTable.identifier(Constants.MOD_ID), new ResourceReloadListener());
   }

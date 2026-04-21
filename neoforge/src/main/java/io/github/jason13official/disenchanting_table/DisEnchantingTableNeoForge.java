@@ -1,5 +1,7 @@
 package io.github.jason13official.disenchanting_table;
 
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
+import io.github.jason13official.disenchanting_table.impl.common.network.ModePacket;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModBlocks;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModEntities;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModItems;
@@ -23,6 +25,8 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 @Mod(Constants.MOD_ID)
@@ -43,6 +47,15 @@ public class DisEnchantingTableNeoForge {
     bind(Registries.CREATIVE_MODE_TAB, ModTabs::register);
 
     EVENT_BUS.addListener((Consumer<FMLCommonSetupEvent>) event -> DisEnchantingTable.init());
+
+    EVENT_BUS.addListener((Consumer<RegisterPayloadHandlersEvent>) event -> {
+      PayloadRegistrar registrar = event.registrar(Constants.MOD_ID);
+      registrar.playToServer(ModePacket.TYPE, ModePacket.STREAM_CODEC, (payload, context) -> {
+        if (context.player().level().getBlockEntity(payload.pos()) instanceof DisEnchantingTableTile tile) {
+          tile.toggleMode();
+        }
+      });
+    });
 
     NeoForge.EVENT_BUS.addListener((Consumer<AddServerReloadListenersEvent>) event -> {
       event.addListener(DisEnchantingTable.identifier(Constants.MOD_ID), new ResourceReloadListener());

@@ -1,35 +1,179 @@
 package io.github.jason13official.disenchanting_table.impl.common.menu;
 
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisenchantMode;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModMenus;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import org.jspecify.annotations.Nullable;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 public class DisEnchantingMenu extends AbstractContainerMenu {
 
+  private static final int SLOT_COUNT = 3;
+  private static final int INV_SLOT_START = SLOT_COUNT;
+  private static final int INV_SLOT_END = INV_SLOT_START + 27;
+  private static final int USE_ROW_SLOT_START = INV_SLOT_END;
+  private static final int USE_ROW_SLOT_END = USE_ROW_SLOT_START + 9;
+
+  private final Container container;
+  private final ContainerData data;
+  private final BlockPos pos;
+
   public DisEnchantingMenu(int containerId, Inventory inventory) {
-    this(containerId, inventory, new SimpleContainer(3), new SimpleContainerData(1));
+    this(containerId, inventory, new SimpleContainer(SLOT_COUNT), new SimpleContainerData(DisEnchantingTableTile.NUM_DATA_VALUES));
   }
 
   public DisEnchantingMenu(int containerId, Inventory inventory, Container container, ContainerData data) {
     super(ModMenus.DISENCHANTING_TABLE, containerId);
+    checkContainerSize(container, SLOT_COUNT);
+    checkContainerDataCount(data, DisEnchantingTableTile.NUM_DATA_VALUES);
+    this.container = container;
+    this.data = data;
+    this.pos = container instanceof DisEnchantingTableTile t ? t.getBlockPos() : BlockPos.ZERO;
+
+    this.addSlot(new InputSlot(container, 0, 27, 47));
+    this.addSlot(new ExtraSlot(container, 1, 76, 47));
+    this.addSlot(new OutputSlot(container, 2, 134, 47, this));
+
+    this.addDataSlots(data);
+    this.addStandardInventorySlots(inventory, 8, 84);
   }
 
   @Override
-  public ItemStack quickMoveStack(Player player, int i) {
-    return ItemStack.EMPTY;
+  public void broadcastChanges() {
+    if (this.container instanceof DisEnchantingTableTile tile) {
+      var level = tile.getLevel();
+      if (level != null && !level.isClientSide() && tile.getMode() == DisenchantMode.MANUAL) {
+        ItemStack expected = tile.canDisenchant() ? tile.buildOutput(tile.getItem(0)) : ItemStack.EMPTY;
+        if (!ItemStack.matches(tile.getItem(2), expected)) {
+          tile.setItem(2, expected);
+          tile.setChanged();
+        }
+      }
+    }
+    super.broadcastChanges();
+  }
+
+  public int getProgress() {
+    return this.data.get(DisEnchantingTableTile.DATA_PROGRESS);
+  }
+
+  public int getMaxProgress() {
+    return this.data.get(DisEnchantingTableTile.DATA_MAX_PROGRESS);
+  }
+
+  public DisenchantMode getMode() {
+    return DisenchantMode.fromInt(this.data.get(DisEnchantingTableTile.DATA_MODE));
+  }
+
+  public BlockPos getPos() {
+    return this.pos;
   }
 
   @Override
   public boolean stillValid(Player player) {
-    return !player.isDeadOrDying();
+    return this.container.stillValid(player);
+  }
+
+  @Override
+  public ItemStack quickMoveStack(Player player, int slotIndex) {
+    ItemStack clicked = ItemStack.EMPTY;
+    Slot slot = this.slots.get(slotIndex);
+    if (slot != null && slot.hasItem()) {
+      ItemStack stack = slot.getItem();
+      clicked = stack.copy();
+      if (slotIndex < SLOT_COUNT) {
+        if (!this.moveItemStackTo(stack, INV_SLOT_START, USE_ROW_SLOT_END, true)) {
+          return ItemStack.EMPTY;
+        }
+        slot.onQuickCraft(stack, clicked);
+      } else {
+        if (!this.moveItemStackTo(stack, 0, SLOT_COUNT, false)) {
+          if (slotIndex < INV_SLOT_END) {
+            if (!this.moveItemStackTo(stack, USE_ROW_SLOT_START, USE_ROW_SLOT_END, false)) {
+              return ItemStack.EMPTY;
+            }
+          } else if (!this.moveItemStackTo(stack, INV_SLOT_START, INV_SLOT_END, false)) {
+            return ItemStack.EMPTY;
+          }
+        }
+      }
+
+      if (stack.isEmpty()) {
+        slot.setByPlayer(ItemStack.EMPTY);
+      } else {
+        slot.setChanged();
+      }
+
+      if (stack.getCount() == clicked.getCount()) {
+        return ItemStack.EMPTY;
+      }
+
+      slot.onTake(player, clicked);
+    }
+
+    return clicked;
+  }
+
+  private static class InputSlot extends Slot {
+    InputSlot(Container container, int slot, int x, int y) {
+      super(container, slot, x, y);
+    }
+
+    @Override
+    public boolean mayPlace(ItemStack stack) {
+      if (stack.is(Items.ENCHANTED_BOOK)) {
+        return EnchantmentHelper.getEnchantmentsForCrafting(stack).size() >= 2;
+      }
+      return !EnchantmentHelper.getEnchantmentsForCrafting(stack).isEmpty();
+    }
+  }
+
+  private static class ExtraSlot extends Slot {
+    ExtraSlot(Container container, int slot, int x, int y) {
+      super(container, slot, x, y);
+    }
+
+    @Override
+    public boolean mayPlace(ItemStack stack) {
+      return stack.is(Items.BOOK);
+    }
+  }
+
+  private static class OutputSlot extends Slot {
+    private final DisEnchantingMenu menu;
+
+    OutputSlot(Container container, int slot, int x, int y, DisEnchantingMenu menu) {
+      super(container, slot, x, y);
+      this.menu = menu;
+    }
+
+    @Override
+    public boolean mayPlace(ItemStack stack) {
+      return false;
+    }
+
+    @Override
+    public void onTake(Player player, ItemStack stack) {
+      if (menu.container instanceof DisEnchantingTableTile tile
+          && tile.getMode() == DisenchantMode.MANUAL) {
+        int cost = tile.computeXpCost(tile.getItem(0));
+        if (player.totalExperience >= cost) {
+          player.giveExperiencePoints(-cost);
+        }
+        tile.consumeInputs();
+        tile.setChanged();
+      }
+      super.onTake(player, stack);
+    }
   }
 }
