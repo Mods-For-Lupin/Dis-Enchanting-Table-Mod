@@ -140,6 +140,9 @@ public abstract class AbstractDisEnchantingTile extends BlockEntity implements C
   @Override
   public void setItem(int i, ItemStack itemStack) {
     this.items.set(i, itemStack);
+    if (this.level != null && !this.level.isClientSide()) {
+      markUpdated();
+    }
   }
 
   @Override
