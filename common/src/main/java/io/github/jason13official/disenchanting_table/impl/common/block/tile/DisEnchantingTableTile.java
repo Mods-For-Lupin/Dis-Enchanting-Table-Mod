@@ -9,7 +9,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -112,6 +116,7 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       }
     }
     tile.setItem(2, tile.buildOutput(input));
+    tile.playCompletionEffect();
     tile.consumeInputs();
     tile.progress = 0;
     tile.progressInput = ItemStack.EMPTY;
@@ -177,6 +182,17 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
     }
 
     getItem(1).shrink(1);
+  }
+
+  public void playCompletionEffect() {
+    if (this.level instanceof ServerLevel serverLevel) {
+      double x = this.worldPosition.getX() + 0.5;
+      double y = this.worldPosition.getY() + 1.0;
+      double z = this.worldPosition.getZ() + 0.5;
+      serverLevel.playSound(null, this.worldPosition, SoundEvents.ENCHANTMENT_TABLE_USE,
+          SoundSource.BLOCKS, 0.6F, serverLevel.getRandom().nextFloat() * 0.1F + 0.9F);
+      serverLevel.sendParticles(ParticleTypes.ENCHANT, x, y, z, 8, 0.3, 0.2, 0.3, 0.1);
+    }
   }
 
   public static int computeXpCost() {

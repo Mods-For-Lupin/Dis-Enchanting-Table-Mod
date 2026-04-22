@@ -189,6 +189,7 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
             ExperienceHelper.deductExperienceLevels(player, cost);
           }
         }
+        tile.playCompletionEffect();
         tile.consumeInputs();
         tile.setChanged();
       }
