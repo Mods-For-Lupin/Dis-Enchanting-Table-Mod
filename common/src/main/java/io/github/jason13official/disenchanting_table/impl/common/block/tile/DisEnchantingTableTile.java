@@ -165,6 +165,7 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       } else {
         ItemStack rebuilt = input.copy();
         rebuilt.set(DataComponents.STORED_ENCHANTMENTS, remaining);
+        rebuilt.set(DataComponents.REPAIR_COST, 0);
         setItem(0, rebuilt);
       }
     } else {
@@ -178,7 +179,7 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
     getItem(1).shrink(1);
   }
 
-  public int computeXpCost(ItemStack input) {
+  public static int computeXpCost(ItemStack input) {
     ItemEnchantments enchants = EnchantmentHelper.getEnchantmentsForCrafting(input);
     if (input.is(Items.ENCHANTED_BOOK)) {
       if (enchants.entrySet().isEmpty()) return 0;

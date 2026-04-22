@@ -3,8 +3,12 @@ package io.github.jason13official.disenchanting_table.impl.client.screen;
 import io.github.jason13official.disenchanting_table.Constants;
 import io.github.jason13official.disenchanting_table.DisEnchantingTable;
 import io.github.jason13official.disenchanting_table.DisEnchantingTableClient;
+import io.github.jason13official.disenchanting_table.impl.client.ClientConfig;
+import io.github.jason13official.disenchanting_table.impl.common.ModConfig;
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisenchantMode;
 import io.github.jason13official.disenchanting_table.impl.common.menu.DisEnchantingMenu;
+import io.github.jason13official.disenchanting_table.impl.common.util.ExperienceHelper;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -12,6 +16,8 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMenu> {
 
@@ -43,12 +49,13 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
     this.modeButton = this.addRenderableWidget(Button.builder(
         modeLabel(),
         b -> {
-          Constants.LOG.info("clicked toggle");
+          // Constants.LOG.info("clicked toggle");
           DisEnchantingTableClient.sendModePacket();
           b.setMessage(modeLabel());
         }
     // ).bounds(xo + 7, yo + 56, 60, 12).build());
-    ).bounds(xo + 7, yo + 68, 60, 12).build());
+    // ).bounds(xo + 7, yo + 68, 60, 12).build());
+    ).bounds(xo + 0, yo - 12, 60, 12).build());
   }
 
   @Override
@@ -87,6 +94,24 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
             PROGRESS_BAR_U, PROGRESS_BAR_V,
             barWidth, PROGRESS_BAR_H,
             256, 256);
+      }
+    }
+
+    if (ClientConfig.get().renderExperienceCost && ModConfig.get().requiresExperience) {
+      ItemStack input = this.menu.getContainer().getItem(0);
+      if (!input.isEmpty()) {
+        int cost = DisEnchantingTableTile.computeXpCost(input);
+        Player player = this.minecraft.player;
+        boolean hasEnough = ModConfig.get().usesPoints
+            ? ExperienceHelper.hasEnoughExperiencePoints(player, cost)
+            : ExperienceHelper.hasEnoughExperienceLevels(player, cost);
+        if (!hasEnough) {
+          Component text = Component.literal("Insufficient Experience!");
+          int xStart = xo + 45;
+          int yStart = yo + 72;
+          graphics.fill(xStart, yStart, xStart + this.font.width(text) + 4, yStart + 11, -12242305);
+          graphics.text(this.font, text, xStart + 2, yStart + 2, -40864);
+        }
       }
     }
   }
