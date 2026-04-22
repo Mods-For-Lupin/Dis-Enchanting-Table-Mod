@@ -169,7 +169,9 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       }
     } else {
       ItemStack stripped = input.copy();
-      stripped.remove(DataComponents.ENCHANTMENTS);
+      // stripped.remove(DataComponents.ENCHANTMENTS);
+      stripped.set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+      stripped.set(DataComponents.REPAIR_COST, 0);
       setItem(0, stripped);
     }
 
@@ -190,6 +192,9 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
     this.mode = this.mode.next();
     this.progress = 0;
     this.progressInput = ItemStack.EMPTY;
+    if (this.mode == DisenchantMode.AUTO) {
+      setItem(2, ItemStack.EMPTY);
+    }
     markUpdated();
   }
 
