@@ -11,7 +11,8 @@ public class ModConfig {
 
   public boolean requiresExperience = true;
   public boolean usesPoints = true;
-  public int costMultiplier = 3;
+  public int experienceCost = 25;
+  public boolean resetsRepairCost = true;
   public int automaticDisenchantingTicks = 100;
 
   public static ModConfig get() {
@@ -36,7 +37,8 @@ public class ModConfig {
       ModConfig loaded = new ModConfig();
       loaded.requiresExperience = config.getOrElse("requires_experience", true);
       loaded.usesPoints = config.getOrElse("uses_points", true);
-      loaded.costMultiplier = config.getOrElse("cost_multiplier", 3);
+      loaded.experienceCost = config.getOrElse("experience_cost", 25);
+      loaded.resetsRepairCost = config.getOrElse("resets_repair_cost", true);
       loaded.automaticDisenchantingTicks = config.getOrElse("automatic_disenchanting_ticks", 100);
       INSTANCE = loaded;
 
@@ -44,8 +46,10 @@ public class ModConfig {
       config.set("requires_experience", INSTANCE.requiresExperience);
       config.setComment("uses_points", " If true, cost is in XP points; if false, cost is in XP levels.");
       config.set("uses_points", INSTANCE.usesPoints);
-      config.setComment("cost_multiplier", " Multiplied by the sum of enchantment levels to determine XP cost.");
-      config.set("cost_multiplier", INSTANCE.costMultiplier);
+      config.setComment("experience_cost", " Flat XP cost (points or levels) per disenchant.");
+      config.set("experience_cost", INSTANCE.experienceCost);
+      config.setComment("resets_repair_cost", " Resets the item's anvil repair cost after disenchanting.");
+      config.set("resets_repair_cost", INSTANCE.resetsRepairCost);
       config.setComment("automatic_disenchanting_ticks", " Number of ticks AUTO mode takes to complete a disenchant.");
       config.set("automatic_disenchanting_ticks", INSTANCE.automaticDisenchantingTicks);
       config.save();

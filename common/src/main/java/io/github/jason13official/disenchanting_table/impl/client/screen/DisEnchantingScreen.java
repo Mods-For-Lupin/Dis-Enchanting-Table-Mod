@@ -55,7 +55,7 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
         }
     // ).bounds(xo + 7, yo + 56, 60, 12).build());
     // ).bounds(xo + 7, yo + 68, 60, 12).build());
-    ).bounds(xo + 0, yo - 12, 60, 12).build());
+    ).bounds(xo + 0, yo - 12, 70, 12).build());
   }
 
   @Override
@@ -97,22 +97,27 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
       }
     }
 
-    if (ClientConfig.get().renderExperienceCost && ModConfig.get().requiresExperience) {
-      ItemStack input = this.menu.getContainer().getItem(0);
-      if (!input.isEmpty()) {
-        int cost = DisEnchantingTableTile.computeXpCost(input);
-        Player player = this.minecraft.player;
-        boolean hasEnough = ModConfig.get().usesPoints
-            ? ExperienceHelper.hasEnoughExperiencePoints(player, cost)
-            : ExperienceHelper.hasEnoughExperienceLevels(player, cost);
-        if (!hasEnough) {
-          Component text = Component.literal("Insufficient Experience!");
-          int xStart = xo + 45;
-          int yStart = yo + 72;
-          graphics.fill(xStart, yStart, xStart + this.font.width(text) + 4, yStart + 11, -12242305);
-          graphics.text(this.font, text, xStart + 2, yStart + 2, -40864);
-        }
-      }
-    }
+  }
+
+  @Override
+  protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
+    super.extractLabels(graphics, xm, ym);
+    if (!ClientConfig.get().renderExperienceCost || !ModConfig.get().requiresExperience) return;
+    if (this.menu.getContainer().getItem(0).isEmpty()) return;
+
+    int cost = DisEnchantingTableTile.computeXpCost();
+    if (cost <= 0) return;
+
+    Player player = this.minecraft.player;
+    boolean hasEnough = ModConfig.get().usesPoints
+        ? ExperienceHelper.hasEnoughExperiencePoints(player, cost)
+        : ExperienceHelper.hasEnoughExperienceLevels(player, cost);
+
+    Component line = Component.translatable("container.disenchanting_table.cost", cost);
+    int color = hasEnough ? -8323296 : -40864;
+    int tx = this.imageWidth - 8 - this.font.width(line) - 2;
+    int ty = 69;
+    graphics.fill(tx - 2, ty - 2, this.imageWidth - 8, ty + 9, 1325400064);
+    graphics.text(this.font, line, tx, ty, color);
   }
 }

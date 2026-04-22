@@ -9,7 +9,11 @@ plugins {
 }
 
 forgix {
-    autoRun = true
+
+    fabric()
+    neoforge()
 
     archiveBaseName = "${mod_id}-merged-${minecraft_version}"
+
+    autoRun = true
 }

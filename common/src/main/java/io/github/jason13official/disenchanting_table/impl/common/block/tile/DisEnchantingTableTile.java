@@ -6,6 +6,7 @@ import io.github.jason13official.disenchanting_table.impl.common.registry.ModTil
 import io.github.jason13official.disenchanting_table.impl.common.util.ExperienceHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -100,7 +101,7 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
         blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 8.0, false);
     if (nearby == null) return;
 
-    int cost = tile.computeXpCost(input);
+    int cost = computeXpCost();
     if (ModConfig.get().requiresExperience) {
       if (ModConfig.get().usesPoints) {
         if (!ExperienceHelper.hasEnoughExperiencePoints(nearby, cost)) return;
@@ -165,28 +166,28 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       } else {
         ItemStack rebuilt = input.copy();
         rebuilt.set(DataComponents.STORED_ENCHANTMENTS, remaining);
-        rebuilt.set(DataComponents.REPAIR_COST, 0);
+        if (ModConfig.get().resetsRepairCost) rebuilt.set(DataComponents.REPAIR_COST, 0);
         setItem(0, rebuilt);
       }
     } else {
       ItemStack stripped = input.copy();
-      // stripped.remove(DataComponents.ENCHANTMENTS);
       stripped.set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
-      stripped.set(DataComponents.REPAIR_COST, 0);
+      if (ModConfig.get().resetsRepairCost) stripped.set(DataComponents.REPAIR_COST, 0);
       setItem(0, stripped);
     }
 
     getItem(1).shrink(1);
   }
 
-  public static int computeXpCost(ItemStack input) {
-    ItemEnchantments enchants = EnchantmentHelper.getEnchantmentsForCrafting(input);
-    if (input.is(Items.ENCHANTED_BOOK)) {
-      if (enchants.entrySet().isEmpty()) return 0;
-      Object2IntMap.Entry<Holder<Enchantment>> first = enchants.entrySet().iterator().next();
-      return first.getIntValue() * ModConfig.get().costMultiplier;
-    }
-    return enchants.entrySet().stream().mapToInt(e -> e.getIntValue() * ModConfig.get().costMultiplier).sum();
+  public static int computeXpCost() {
+    return ModConfig.get().experienceCost;
+  }
+
+  @Override
+  public boolean canTakeItemThroughFace(int i, ItemStack itemStack, Direction direction) {
+    if (i == 0) return !isValidInput(itemStack);
+    if (i == 2) return this.mode == DisenchantMode.AUTO;
+    return false;
   }
 
   public void toggleMode() {

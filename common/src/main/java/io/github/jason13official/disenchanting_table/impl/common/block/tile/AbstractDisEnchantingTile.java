@@ -29,7 +29,7 @@ import org.jspecify.annotations.Nullable;
 public abstract class AbstractDisEnchantingTile extends BlockEntity implements Container, WorldlyContainer, Clearable {
 
   private static final int[] SLOTS_FOR_UP = new int[] {0, 1};
-  private static final int[] SLOTS_FOR_DOWN = new int[] {2};
+  private static final int[] SLOTS_FOR_DOWN = new int[] {0, 2};
   private static final int[] SLOTS_FOR_SIDES = new int[] {0, 1};
 
   private final NonNullList<ItemStack> items;

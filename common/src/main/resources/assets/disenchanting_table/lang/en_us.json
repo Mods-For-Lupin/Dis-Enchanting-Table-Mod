@@ -4,5 +4,6 @@
   "item.disenchanting_table.disenchanting_table": "Dis-Enchanting Table",
   "container.disenchanting_table": "Dis-Enchanting Table",
   "gui.disenchanting_table.mode.manual": "Mode: Manual",
-  "gui.disenchanting_table.mode.auto": "Mode: Auto"
+  "gui.disenchanting_table.mode.auto": "Mode: Auto",
+  "container.disenchanting_table.cost": "Dis-enchanting Cost: %s"
 }

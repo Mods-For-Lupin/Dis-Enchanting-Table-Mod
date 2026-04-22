@@ -169,7 +169,7 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
       if (menu.container instanceof DisEnchantingTableTile tile
           && tile.getMode() == DisenchantMode.MANUAL
           && ModConfig.get().requiresExperience) {
-        int cost = DisEnchantingTableTile.computeXpCost(tile.getItem(0));
+        int cost = DisEnchantingTableTile.computeXpCost();
         return ModConfig.get().usesPoints
             ? ExperienceHelper.hasEnoughExperiencePoints(player, cost)
             : ExperienceHelper.hasEnoughExperienceLevels(player, cost);
@@ -181,7 +181,7 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
     public void onTake(Player player, ItemStack stack) {
       if (menu.container instanceof DisEnchantingTableTile tile
           && tile.getMode() == DisenchantMode.MANUAL) {
-        int cost = DisEnchantingTableTile.computeXpCost(tile.getItem(0));
+        int cost = DisEnchantingTableTile.computeXpCost();
         if (ModConfig.get().requiresExperience) {
           if (ModConfig.get().usesPoints) {
             ExperienceHelper.deductExperiencePoints(player, cost);
