@@ -20,7 +20,7 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
 
   // Progress bar source UV in the texture: 176x0, 22x16 pixels
   private static final int PROGRESS_BAR_U = 176;
-  private static final int PROGRESS_BAR_V = 0;
+  private static final int PROGRESS_BAR_V = 21;
   private static final int PROGRESS_BAR_W = 22;
   private static final int PROGRESS_BAR_H = 16;
 
@@ -33,6 +33,11 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
   @Override
   protected void init() {
     super.init();
+
+    // moves labels off-screen to reduce clutter
+    this.titleLabelY = 9999;
+    this.inventoryLabelY = 9999;
+
     int xo = (this.width - this.imageWidth) / 2;
     int yo = (this.height - this.imageHeight) / 2;
     this.modeButton = this.addRenderableWidget(Button.builder(
@@ -42,7 +47,8 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
           DisEnchantingTableClient.sendModePacket();
           b.setMessage(modeLabel());
         }
-    ).bounds(xo + 7, yo + 56, 60, 12).build());
+    // ).bounds(xo + 7, yo + 56, 60, 12).build());
+    ).bounds(xo + 7, yo + 68, 60, 12).build());
   }
 
   @Override
@@ -50,6 +56,9 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
     super.containerTick();
     if (this.modeButton != null) {
       this.modeButton.setMessage(modeLabel());
+      boolean outputOccupied = this.menu.getMode() == DisenchantMode.AUTO
+          && !this.menu.getContainer().getItem(2).isEmpty();
+      this.modeButton.active = !outputOccupied;
     }
   }
 
@@ -73,7 +82,8 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
       int barWidth = PROGRESS_BAR_W * progress / maxProgress;
       if (barWidth > 0) {
         graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND,
-            xo + 79, yo + 34,
+            // xo + 79, yo + 34,
+            xo + 102, yo + 45,
             PROGRESS_BAR_U, PROGRESS_BAR_V,
             barWidth, PROGRESS_BAR_H,
             256, 256);

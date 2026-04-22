@@ -189,6 +189,7 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
   }
 
   public void toggleMode() {
+    if (this.mode == DisenchantMode.AUTO && !getItem(2).isEmpty()) return;
     this.mode = this.mode.next();
     this.progress = 0;
     this.progressInput = ItemStack.EMPTY;
