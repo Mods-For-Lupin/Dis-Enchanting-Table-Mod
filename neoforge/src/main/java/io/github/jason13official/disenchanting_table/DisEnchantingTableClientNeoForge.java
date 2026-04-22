@@ -1,10 +1,13 @@
 package io.github.jason13official.disenchanting_table;
 
+import io.github.jason13official.disenchanting_table.impl.client.renderer.DisEnchantingTableRenderer;
 import io.github.jason13official.disenchanting_table.impl.client.screen.DisEnchantingScreen;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModMenus;
+import io.github.jason13official.disenchanting_table.impl.common.registry.ModTiles;
 import java.util.function.Consumer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 
@@ -20,5 +23,8 @@ public class DisEnchantingTableClientNeoForge {
     modEventBus.addListener((Consumer<RegisterMenuScreensEvent>) event -> {
       event.register(ModMenus.DISENCHANTING_TABLE, DisEnchantingScreen::new);
     });
+
+    modEventBus.addListener((Consumer<EntityRenderersEvent.RegisterRenderers>) event ->
+        event.registerBlockEntityRenderer(ModTiles.DISENCHANTING_TABLE, DisEnchantingTableRenderer::new));
   }
 }

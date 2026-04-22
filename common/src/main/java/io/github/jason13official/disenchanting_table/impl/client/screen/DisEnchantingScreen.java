@@ -39,7 +39,7 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
         modeLabel(),
         b -> {
           Constants.LOG.info("clicked toggle");
-          DisEnchantingTableClient.sendModePacket(this.menu.getPos());
+          DisEnchantingTableClient.sendModePacket();
           b.setMessage(modeLabel());
         }
     ).bounds(xo + 7, yo + 56, 60, 12).build());

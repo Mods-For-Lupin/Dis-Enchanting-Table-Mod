@@ -1,7 +1,9 @@
 package io.github.jason13official.disenchanting_table.impl.common.block.tile;
 
+import io.github.jason13official.disenchanting_table.impl.common.ModConfig;
 import io.github.jason13official.disenchanting_table.impl.common.menu.DisEnchantingMenu;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModTiles;
+import io.github.jason13official.disenchanting_table.impl.common.util.ExperienceHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -74,6 +76,8 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
   public static void tickServer(Level level, BlockPos blockPos, BlockState state, DisEnchantingTableTile tile) {
     if (tile.mode != DisenchantMode.AUTO) return;
 
+    tile.maxProgress = ModConfig.get().automaticDisenchantingTicks;
+
     ItemStack input = tile.getItem(0);
 
     if (!ItemStack.matches(input, tile.progressInput)) {
@@ -86,8 +90,8 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       return;
     }
 
-    tile.progress++;
     if (tile.progress < tile.maxProgress) {
+      tile.progress++;
       setChanged(level, blockPos, state);
       return;
     }
@@ -97,9 +101,15 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
     if (nearby == null) return;
 
     int cost = tile.computeXpCost(input);
-    if (nearby.totalExperience < cost) return;
-
-    nearby.giveExperiencePoints(-cost);
+    if (ModConfig.get().requiresExperience) {
+      if (ModConfig.get().usesPoints) {
+        if (!ExperienceHelper.hasEnoughExperiencePoints(nearby, cost)) return;
+        ExperienceHelper.deductExperiencePoints(nearby, cost);
+      } else {
+        if (!ExperienceHelper.hasEnoughExperienceLevels(nearby, cost)) return;
+        ExperienceHelper.deductExperienceLevels(nearby, cost);
+      }
+    }
     tile.setItem(2, tile.buildOutput(input));
     tile.consumeInputs();
     tile.progress = 0;
@@ -171,9 +181,9 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
     if (input.is(Items.ENCHANTED_BOOK)) {
       if (enchants.entrySet().isEmpty()) return 0;
       Object2IntMap.Entry<Holder<Enchantment>> first = enchants.entrySet().iterator().next();
-      return first.getIntValue() * 3;
+      return first.getIntValue() * ModConfig.get().costMultiplier;
     }
-    return enchants.entrySet().stream().mapToInt(e -> e.getIntValue() * 3).sum();
+    return enchants.entrySet().stream().mapToInt(e -> e.getIntValue() * ModConfig.get().costMultiplier).sum();
   }
 
   public void toggleMode() {
@@ -185,6 +195,13 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
 
   public DisenchantMode getMode() {
     return mode;
+  }
+
+  public ItemStack getRenderedItemStack() {
+    if (!getItem(2).isEmpty()) return getItem(2);
+    if (!getItem(0).isEmpty()) return getItem(0);
+    if (!getItem(1).isEmpty()) return new ItemStack(Items.BOOK);
+    return ItemStack.EMPTY;
   }
 
   @Override

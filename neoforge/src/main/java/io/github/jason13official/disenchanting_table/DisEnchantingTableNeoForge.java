@@ -1,6 +1,9 @@
 package io.github.jason13official.disenchanting_table;
 
+import io.github.jason13official.disenchanting_table.impl.common.ModConfig;
+import io.github.jason13official.disenchanting_table.impl.common.menu.DisEnchantingMenu;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
+import io.github.jason13official.disenchanting_table.platform.Services;
 import io.github.jason13official.disenchanting_table.impl.common.network.ModePacket;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModBlocks;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModEntities;
@@ -51,8 +54,9 @@ public class DisEnchantingTableNeoForge {
     EVENT_BUS.addListener((Consumer<RegisterPayloadHandlersEvent>) event -> {
       PayloadRegistrar registrar = event.registrar(Constants.MOD_ID);
       registrar.playToServer(ModePacket.TYPE, ModePacket.STREAM_CODEC, (payload, context) -> {
-        context.enqueueWork(() ->{
-          if (context.player().level().getBlockEntity(payload.pos()) instanceof DisEnchantingTableTile tile) {
+        context.enqueueWork(() -> {
+          if (context.player().containerMenu instanceof DisEnchantingMenu menu
+              && menu.getContainer() instanceof DisEnchantingTableTile tile) {
             tile.toggleMode();
           }
         });
@@ -86,7 +90,7 @@ public class DisEnchantingTableNeoForge {
 
     @Override
     protected void apply(Void unused, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
-      // ModConfig.load(Services.PLATFORM.getConfigDirectory());
+      ModConfig.load(Services.PLATFORM.getConfigDirectory());
     }
 
     @Override

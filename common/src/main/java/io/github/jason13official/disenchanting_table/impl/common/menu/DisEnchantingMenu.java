@@ -1,9 +1,10 @@
 package io.github.jason13official.disenchanting_table.impl.common.menu;
 
+import io.github.jason13official.disenchanting_table.impl.common.ModConfig;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisenchantMode;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModMenus;
-import net.minecraft.core.BlockPos;
+import io.github.jason13official.disenchanting_table.impl.common.util.ExperienceHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -26,7 +27,6 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
 
   private final Container container;
   private final ContainerData data;
-  private final BlockPos pos;
 
   public DisEnchantingMenu(int containerId, Inventory inventory) {
     this(containerId, inventory, new SimpleContainer(SLOT_COUNT), new SimpleContainerData(DisEnchantingTableTile.NUM_DATA_VALUES));
@@ -38,7 +38,6 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
     checkContainerDataCount(data, DisEnchantingTableTile.NUM_DATA_VALUES);
     this.container = container;
     this.data = data;
-    this.pos = container instanceof DisEnchantingTableTile t ? t.getBlockPos() : BlockPos.ZERO;
 
     this.addSlot(new InputSlot(container, 0, 27, 47));
     this.addSlot(new ExtraSlot(container, 1, 76, 47));
@@ -78,8 +77,8 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
     return DisenchantMode.fromInt(this.data.get(DisEnchantingTableTile.DATA_MODE));
   }
 
-  public BlockPos getPos() {
-    return this.pos;
+  public Container getContainer() {
+    return this.container;
   }
 
   @Override
@@ -170,8 +169,12 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
       if (menu.container instanceof DisEnchantingTableTile tile
           && tile.getMode() == DisenchantMode.MANUAL) {
         int cost = tile.computeXpCost(tile.getItem(0));
-        if (player.totalExperience >= cost) {
-          player.giveExperiencePoints(-cost);
+        if (ModConfig.get().requiresExperience) {
+          if (ModConfig.get().usesPoints) {
+            ExperienceHelper.deductExperiencePoints(player, cost);
+          } else {
+            ExperienceHelper.deductExperienceLevels(player, cost);
+          }
         }
         tile.consumeInputs();
         tile.setChanged();

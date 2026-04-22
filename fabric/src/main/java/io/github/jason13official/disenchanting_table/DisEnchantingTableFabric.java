@@ -1,6 +1,9 @@
 package io.github.jason13official.disenchanting_table;
 
+import io.github.jason13official.disenchanting_table.impl.common.ModConfig;
+import io.github.jason13official.disenchanting_table.impl.common.menu.DisEnchantingMenu;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
+import io.github.jason13official.disenchanting_table.platform.Services;
 import io.github.jason13official.disenchanting_table.impl.common.network.ModePacket;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModBlocks;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModEntities;
@@ -40,7 +43,8 @@ public class DisEnchantingTableFabric implements ModInitializer {
 
     PayloadTypeRegistry.serverboundPlay().register(ModePacket.TYPE, ModePacket.STREAM_CODEC);
     ServerPlayNetworking.registerGlobalReceiver(ModePacket.TYPE, (payload, context) -> {
-      if (context.player().level().getBlockEntity(payload.pos()) instanceof DisEnchantingTableTile tile) {
+      if (context.player().containerMenu instanceof DisEnchantingMenu menu
+          && menu.getContainer() instanceof DisEnchantingTableTile tile) {
         tile.toggleMode();
       }
     });
@@ -62,7 +66,7 @@ public class DisEnchantingTableFabric implements ModInitializer {
 
     @Override
     protected void apply(Void unused, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
-      // ModConfig.load(Services.PLATFORM.getConfigDirectory());
+      ModConfig.load(Services.PLATFORM.getConfigDirectory());
     }
 
     @Override

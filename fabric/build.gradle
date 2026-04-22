@@ -1,11 +1,25 @@
 plugins {
     id 'multiloader-loader'
     id 'net.fabricmc.fabric-loom'
+    id 'com.github.johnrengelman.shadow'
 }
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    shade 'com.electronwill.night-config:toml:3.6.0'
+}
+
+shadowJar {
+    configurations = [project.configurations.shade]
+    relocate 'com.electronwill.nightconfig', 'io.github.jason13official.disenchanting_table.shadow.nightconfig'
+    archiveClassifier.set('dev-shadow')
 }
 
 loom {
