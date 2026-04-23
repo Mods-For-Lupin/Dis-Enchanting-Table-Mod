@@ -201,8 +201,9 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
 
   @Override
   public boolean canTakeItemThroughFace(int i, ItemStack itemStack, Direction direction) {
+    if (this.mode != DisenchantMode.AUTO) return false;
     if (i == 0) return !isValidInput(itemStack);
-    if (i == 2) return this.mode == DisenchantMode.AUTO;
+    if (i == 2) return true;
     return false;
   }
 

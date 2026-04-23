@@ -5,15 +5,36 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.141' apply false
     id 'com.github.johnrengelman.shadow' version '8.1.1' apply false
 
-    id "io.github.pacifistmc.forgix" version "2.0.0-SNAPSHOT.5.1"
+    // Forgix, see https://github.com/PacifistMC/Forgix/releases for new versions
+    id "io.github.pacifistmc.forgix" version "1.2.9"
 }
 
 forgix {
+    group = "${project.group}"
+    mergedJarName = "${mod_id}-merged-${minecraft_version}-${project.version}.jar"
+    outputDir = "build/libs"
 
-    fabric()
-    neoforge()
+    custom {
+        projectName = "common"
+        jarLocation = "build/libs/${mod_id}-common-${minecraft_version}-${project.version}.jar"
+    }
 
-    archiveBaseName = "${mod_id}-merged-${minecraft_version}"
+    fabric {
+        projectName = "fabric"
+        jarLocation = "build/libs/${mod_id}-fabric-${minecraft_version}-${project.version}.jar"
+    }
 
-    autoRun = true
+//    forge {
+//        projectName = "forge"
+//        jarLocation = "build/libs/${mod_id}-forge-${minecraft_version}-${project.version}.jar"
+//
+//        mixin "${mod_id}.forge.mixins.json"
+//    }
+
+    neoforge {
+        projectName = "neoforge"
+        jarLocation = "build/libs/${mod_id}-neoforge-${minecraft_version}-${project.version}.jar"
+
+        mixin "${mod_id}.neoforge.mixins.json"
+    }
 }

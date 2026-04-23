@@ -14,4 +14,12 @@ public enum DisenchantMode {
     public static DisenchantMode fromInt(int value) {
         return value == 1 ? AUTO : MANUAL;
     }
+
+    @Override
+    public String toString() {
+        return switch (this) {
+            case AUTO -> "Auto";
+            case MANUAL -> "Manual";
+        };
+    }
 }
