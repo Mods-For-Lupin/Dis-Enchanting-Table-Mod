@@ -17,11 +17,10 @@ import java.util.function.Consumer;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.impl.resource.DataResourceLoaderImpl;
+import net.fabricmc.fabric.api.resource.v1.DataResourceLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -31,6 +30,8 @@ public class DisEnchantingTableFabric implements ModInitializer {
   @Override
   public void onInitialize() {
 
+    Constants.LOG.info("DisEnchantingTableFabric#onInitialize");
+
     bind(BuiltInRegistries.BLOCK, ModBlocks::register);
     bind(BuiltInRegistries.ENTITY_TYPE, ModEntities::register);
     bind(BuiltInRegistries.ITEM, ModItems::register);
@@ -39,7 +40,11 @@ public class DisEnchantingTableFabric implements ModInitializer {
     bind(BuiltInRegistries.MENU, ModMenus::register);
     bind(BuiltInRegistries.CREATIVE_MODE_TAB, ModTabs::register);
 
+    Constants.LOG.info("DisEnchantingTableFabric game objects initialized.");
+
     DisEnchantingTable.init();
+
+    Constants.LOG.info("DisEnchantingTableFabric config initialized.");
 
     PayloadTypeRegistry.serverboundPlay().register(ModePacket.TYPE, ModePacket.STREAM_CODEC);
     ServerPlayNetworking.registerGlobalReceiver(ModePacket.TYPE, (payload, context) -> {
@@ -52,7 +57,11 @@ public class DisEnchantingTableFabric implements ModInitializer {
       }
     });
 
-    DataResourceLoaderImpl.get(PackType.SERVER_DATA).registerReloadListener(DisEnchantingTable.identifier(Constants.MOD_ID), new ResourceReloadListener());
+    Constants.LOG.info("DisEnchantingTableFabric networking initialized.");
+
+    DataResourceLoader.get().registerReloadListener(DisEnchantingTable.identifier(Constants.MOD_ID), new ResourceReloadListener());
+
+    Constants.LOG.info("DisEnchantingTableFabric reload listener initialized.");
   }
 
   public <T> void bind(Registry<T> registry, Consumer<BiConsumer<T, Identifier>> source) {
