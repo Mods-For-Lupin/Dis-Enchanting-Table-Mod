@@ -9,6 +9,7 @@ public class ModConfig {
 
   private static ModConfig INSTANCE = new ModConfig();
 
+  public boolean automaticModeAllowed = true;
   public boolean requiresExperience = true;
   public boolean usesPoints = true;
   public int experienceCost = 25;
@@ -35,6 +36,7 @@ public class ModConfig {
       }
 
       ModConfig loaded = new ModConfig();
+      loaded.automaticModeAllowed = config.getOrElse("automatic_mode_allowed", true);
       loaded.requiresExperience = config.getOrElse("requires_experience", true);
       loaded.usesPoints = config.getOrElse("uses_points", true);
       loaded.experienceCost = config.getOrElse("experience_cost", 25);
@@ -42,6 +44,8 @@ public class ModConfig {
       loaded.automaticDisenchantingTicks = config.getOrElse("automatic_disenchanting_ticks", 100);
       INSTANCE = loaded;
 
+      config.setComment("automatic_mode_allowed", " Whether players are allowed to use automatic mode.");
+      config.set("automatic_mode_allowed", INSTANCE.automaticModeAllowed);
       config.setComment("requires_experience", " Whether the player must spend experience to disenchant.");
       config.set("requires_experience", INSTANCE.requiresExperience);
       config.setComment("uses_points", " If true, cost is in XP points; if false, cost is in XP levels.");

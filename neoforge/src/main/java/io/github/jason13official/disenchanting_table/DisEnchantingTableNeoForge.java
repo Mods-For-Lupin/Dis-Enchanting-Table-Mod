@@ -55,6 +55,9 @@ public class DisEnchantingTableNeoForge {
       PayloadRegistrar registrar = event.registrar(Constants.MOD_ID);
       registrar.playToServer(ModePacket.TYPE, ModePacket.STREAM_CODEC, (payload, context) -> {
         context.enqueueWork(() -> {
+          if (!ModConfig.get().automaticModeAllowed) {
+            return;
+          }
           if (context.player().containerMenu instanceof DisEnchantingMenu menu
               && menu.getContainer() instanceof DisEnchantingTableTile tile) {
             tile.toggleMode();

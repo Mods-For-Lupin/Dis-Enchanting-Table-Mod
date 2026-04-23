@@ -43,6 +43,9 @@ public class DisEnchantingTableFabric implements ModInitializer {
 
     PayloadTypeRegistry.serverboundPlay().register(ModePacket.TYPE, ModePacket.STREAM_CODEC);
     ServerPlayNetworking.registerGlobalReceiver(ModePacket.TYPE, (payload, context) -> {
+      if (!ModConfig.get().automaticModeAllowed) {
+        return;
+      }
       if (context.player().containerMenu instanceof DisEnchantingMenu menu
           && menu.getContainer() instanceof DisEnchantingTableTile tile) {
         tile.toggleMode();
