@@ -167,7 +167,9 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       mutable.set(first.getKey(), 0);
       ItemEnchantments remaining = mutable.toImmutable();
       if (remaining.isEmpty()) {
-        setItem(0, new ItemStack(Items.BOOK));
+        // in practice, this logic never occurs due to isValidInput(ItemStack) blocking it
+        // setItem(0, new ItemStack(Items.BOOK));
+        setItem(0, ItemStack.EMPTY);
       } else {
         ItemStack rebuilt = input.copy();
         rebuilt.set(DataComponents.STORED_ENCHANTMENTS, remaining);

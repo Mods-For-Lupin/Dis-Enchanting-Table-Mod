@@ -4,16 +4,15 @@ plugins {
     id 'com.gradleup.shadow'
 }
 
-//configurations {
-//    shade
-//    implementation.extendsFrom shade
-//}
+configurations {
+    runtimeClasspath.extendsFrom(configurations.shadow)
+}
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    
+
     shadow 'com.electronwill.night-config:toml:3.6.0'
 }
 
