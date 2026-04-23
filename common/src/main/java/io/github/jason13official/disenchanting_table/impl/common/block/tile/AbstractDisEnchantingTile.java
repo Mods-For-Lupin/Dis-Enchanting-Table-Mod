@@ -28,9 +28,9 @@ import org.jspecify.annotations.Nullable;
 /// [CampfireBlockEntity]
 public abstract class AbstractDisEnchantingTile extends BlockEntity implements Container, WorldlyContainer, Clearable {
 
-  private static final int[] SLOTS_FOR_UP = new int[] {0, 1};
-  private static final int[] SLOTS_FOR_DOWN = new int[] {0, 2};
-  private static final int[] SLOTS_FOR_SIDES = new int[] {0, 1};
+  private static final int[] SLOTS_FOR_UP = new int[]{0, 1};
+  private static final int[] SLOTS_FOR_DOWN = new int[]{0, 2};
+  private static final int[] SLOTS_FOR_SIDES = new int[]{0, 1};
 
   private final NonNullList<ItemStack> items;
 
@@ -94,16 +94,18 @@ public abstract class AbstractDisEnchantingTile extends BlockEntity implements C
 
   @Override
   public boolean canPlaceItemThroughFace(int i, ItemStack itemStack, @Nullable Direction direction) {
-    if (i == 2) return false;
+    if (i == 2) {
+      return false;
+    }
     if (i == 0) {
       if (itemStack.is(net.minecraft.world.item.Items.ENCHANTED_BOOK)) {
-        return net.minecraft.world.item.enchantment.EnchantmentHelper
-            .getEnchantmentsForCrafting(itemStack).size() >= 2;
+        return net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantmentsForCrafting(itemStack).size() >= 2;
       }
-      return !net.minecraft.world.item.enchantment.EnchantmentHelper
-          .getEnchantmentsForCrafting(itemStack).isEmpty();
+      return !net.minecraft.world.item.enchantment.EnchantmentHelper.getEnchantmentsForCrafting(itemStack).isEmpty();
     }
-    if (i == 1) return itemStack.is(net.minecraft.world.item.Items.BOOK);
+    if (i == 1) {
+      return itemStack.is(net.minecraft.world.item.Items.BOOK);
+    }
     return false;
   }
 

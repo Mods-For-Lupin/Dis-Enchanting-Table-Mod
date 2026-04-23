@@ -11,9 +11,7 @@ import io.github.jason13official.disenchanting_table.impl.common.util.Experience
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -29,8 +27,7 @@ import net.minecraft.world.item.Items;
 
 public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMenu> {
 
-  public static final Identifier BACKGROUND =
-      DisEnchantingTable.identifier("textures/gui/container/disenchanting_table.png");
+  public static final Identifier BACKGROUND = DisEnchantingTable.identifier("textures/gui/container/disenchanting_table.png");
 
   private static final Supplier<ItemStack> ENCHANTED_HOPPER = () -> {
     ItemStack stack = new ItemStack(Items.HOPPER);
@@ -95,8 +92,6 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
   protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
     super.extractTooltip(graphics, mouseX, mouseY);
 
-
-
     int xo = (this.width - this.imageWidth) / 2;
     int yo = (this.height - this.imageHeight) / 2;
     double lowerX = xo + 86;
@@ -117,7 +112,7 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
     }
   }
 
-  private boolean isHovering(int mouseX, int mouseY, int x, int y, int width, int height){
+  private boolean isHovering(int mouseX, int mouseY, int x, int y, int width, int height) {
     return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
   }
 
@@ -134,9 +129,7 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
 
   private Component modeLabel() {
     DisenchantMode mode = this.menu.getMode();
-    return mode == DisenchantMode.AUTO
-        ? Component.translatable("gui.disenchanting_table.mode.auto")
-        : Component.translatable("gui.disenchanting_table.mode.manual");
+    return mode == DisenchantMode.AUTO ? Component.translatable("gui.disenchanting_table.mode.auto") : Component.translatable("gui.disenchanting_table.mode.manual");
   }
 
   @Override
@@ -161,10 +154,7 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
       if (barWidth > 0) {
         graphics.blit(RenderPipelines.GUI_TEXTURED, BACKGROUND,
             // xo + 79, yo + 34,
-            xo + 102, yo + 45,
-            PROGRESS_BAR_U, PROGRESS_BAR_V,
-            barWidth, PROGRESS_BAR_H,
-            256, 256);
+            xo + 102, yo + 45, PROGRESS_BAR_U, PROGRESS_BAR_V, barWidth, PROGRESS_BAR_H, 256, 256);
       }
     }
 
@@ -173,20 +163,22 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
   @Override
   protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
     super.extractLabels(graphics, xm, ym);
-    if (!ClientConfig.get().renderExperienceCost || !ModConfig.get().requiresExperience) return;
-    if (this.menu.getContainer().getItem(0).isEmpty()) return;
+    if (!ClientConfig.get().renderExperienceCost || !ModConfig.get().requiresExperience) {
+      return;
+    }
+    if (this.menu.getContainer().getItem(0).isEmpty()) {
+      return;
+    }
 
     int cost = DisEnchantingTableTile.computeXpCost();
-    if (cost <= 0) return;
+    if (cost <= 0) {
+      return;
+    }
 
     Player player = this.minecraft.player;
-    boolean hasEnough = ModConfig.get().usesPoints
-        ? ExperienceHelper.hasEnoughExperiencePoints(player, cost)
-        : ExperienceHelper.hasEnoughExperienceLevels(player, cost);
+    boolean hasEnough = ModConfig.get().usesPoints ? ExperienceHelper.hasEnoughExperiencePoints(player, cost) : ExperienceHelper.hasEnoughExperienceLevels(player, cost);
 
-    Component line = ModConfig.get().usesPoints
-        ? Component.translatable("container.disenchanting_table.cost_points", cost)
-        : Component.translatable("container.disenchanting_table.cost_levels", cost);
+    Component line = ModConfig.get().usesPoints ? Component.translatable("container.disenchanting_table.cost_points", cost) : Component.translatable("container.disenchanting_table.cost_levels", cost);
 
     int color = hasEnough ? -8323296 : -40864;
 

@@ -4,7 +4,6 @@ import io.github.jason13official.disenchanting_table.Constants;
 import io.github.jason13official.disenchanting_table.DisEnchantingTable;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
 import io.github.jason13official.disenchanting_table.platform.Services;
-import java.util.List;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import net.minecraft.resources.Identifier;

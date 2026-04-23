@@ -26,16 +26,19 @@ public class ExperienceHelper {
 
   // Mirrors Player.getXpNeededForNextLevel() iteratively — no arithmetic series formula needed.
   public static int getTotalPlayerExperiencePoints(Player player) {
-    return getTotalXpForLevel(player.experienceLevel)
-        + (int) (player.experienceProgress * player.getXpNeededForNextLevel());
+    return getTotalXpForLevel(player.experienceLevel) + (int) (player.experienceProgress * player.getXpNeededForNextLevel());
   }
 
   private static int getTotalXpForLevel(int level) {
     int total = 0;
     for (int i = 0; i < level; i++) {
-      if (i >= 30)      total += 112 + (i - 30) * 9;
-      else if (i >= 15) total += 37  + (i - 15) * 5;
-      else              total += 7   + i * 2;
+      if (i >= 30) {
+        total += 112 + (i - 30) * 9;
+      } else if (i >= 15) {
+        total += 37 + (i - 15) * 5;
+      } else {
+        total += 7 + i * 2;
+      }
     }
     return total;
   }

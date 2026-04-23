@@ -15,10 +15,8 @@ public class ModTabs {
 
   public static void register(BiConsumer<CreativeModeTab, Identifier> consumer) {
 
-    DISENCHANTING_TABLE = Services.registry().tabBuilder(ModItems.DISENCHANTING_TABLE)
-        .icon(() -> new ItemStack(ModItems.DISENCHANTING_TABLE))
-        .title(Component.translatable("itemGroup.disenchantingTable"))
-        .build();
+    DISENCHANTING_TABLE = Services.registry().tabBuilder(ModItems.DISENCHANTING_TABLE).icon(() -> new ItemStack(ModItems.DISENCHANTING_TABLE))
+        .title(Component.translatable("itemGroup.disenchantingTable")).build();
 
     consumer.accept(DISENCHANTING_TABLE, DisEnchantingTable.identifier(Constants.MOD_ID));
   }

@@ -42,9 +42,6 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
   private int progress;
   private int maxProgress = DEFAULT_MAX_PROGRESS;
   private DisenchantMode mode = DisenchantMode.MANUAL;
-
-  private ItemStack progressInput = ItemStack.EMPTY;
-
   protected final ContainerData dataAccess = new ContainerData() {
     @Override
     public int get(int dataId) {
@@ -70,6 +67,7 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       return NUM_DATA_VALUES;
     }
   };
+  private ItemStack progressInput = ItemStack.EMPTY;
 
   public DisEnchantingTableTile(BlockPos worldPosition, BlockState blockState) {
     super(ModTiles.DISENCHANTING_TABLE, worldPosition, blockState);
@@ -79,7 +77,9 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
   }
 
   public static void tickServer(Level level, BlockPos blockPos, BlockState state, DisEnchantingTableTile tile) {
-    if (tile.mode != DisenchantMode.AUTO) return;
+    if (tile.mode != DisenchantMode.AUTO) {
+      return;
+    }
 
     tile.maxProgress = ModConfig.get().automaticDisenchantingTicks;
 
@@ -101,17 +101,22 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       return;
     }
 
-    Player nearby = level.getNearestPlayer(
-        blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 8.0, false);
-    if (nearby == null) return;
+    Player nearby = level.getNearestPlayer(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, 8.0, false);
+    if (nearby == null) {
+      return;
+    }
 
     int cost = computeXpCost();
     if (ModConfig.get().requiresExperience) {
       if (ModConfig.get().usesPoints) {
-        if (!ExperienceHelper.hasEnoughExperiencePoints(nearby, cost)) return;
+        if (!ExperienceHelper.hasEnoughExperiencePoints(nearby, cost)) {
+          return;
+        }
         ExperienceHelper.deductExperiencePoints(nearby, cost);
       } else {
-        if (!ExperienceHelper.hasEnoughExperienceLevels(nearby, cost)) return;
+        if (!ExperienceHelper.hasEnoughExperienceLevels(nearby, cost)) {
+          return;
+        }
         ExperienceHelper.deductExperienceLevels(nearby, cost);
       }
     }
@@ -123,12 +128,20 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
     tile.markUpdated();
   }
 
+  public static int computeXpCost() {
+    return ModConfig.get().experienceCost;
+  }
+
   public boolean canDisenchant() {
     ItemStack input = getItem(0);
     ItemStack extra = getItem(1);
     ItemStack output = getItem(2);
-    if (input.isEmpty() || extra.isEmpty() || !output.isEmpty()) return false;
-    if (!extra.is(Items.BOOK)) return false;
+    if (input.isEmpty() || extra.isEmpty() || !output.isEmpty()) {
+      return false;
+    }
+    if (!extra.is(Items.BOOK)) {
+      return false;
+    }
     return isValidInput(input);
   }
 
@@ -141,7 +154,9 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
 
   public ItemStack buildOutput(ItemStack input) {
     ItemEnchantments enchants = EnchantmentHelper.getEnchantmentsForCrafting(input);
-    if (enchants.isEmpty()) return ItemStack.EMPTY;
+    if (enchants.isEmpty()) {
+      return ItemStack.EMPTY;
+    }
 
     if (input.is(Items.ENCHANTED_BOOK)) {
       Object2IntMap.Entry<Holder<Enchantment>> first = enchants.entrySet().iterator().next();
@@ -173,13 +188,17 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       } else {
         ItemStack rebuilt = input.copy();
         rebuilt.set(DataComponents.STORED_ENCHANTMENTS, remaining);
-        if (ModConfig.get().resetsRepairCost) rebuilt.set(DataComponents.REPAIR_COST, 0);
+        if (ModConfig.get().resetsRepairCost) {
+          rebuilt.set(DataComponents.REPAIR_COST, 0);
+        }
         setItem(0, rebuilt);
       }
     } else {
       ItemStack stripped = input.copy();
       stripped.set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
-      if (ModConfig.get().resetsRepairCost) stripped.set(DataComponents.REPAIR_COST, 0);
+      if (ModConfig.get().resetsRepairCost) {
+        stripped.set(DataComponents.REPAIR_COST, 0);
+      }
       setItem(0, stripped);
     }
 
@@ -191,26 +210,26 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
       double x = this.worldPosition.getX() + 0.5;
       double y = this.worldPosition.getY() + 1.0;
       double z = this.worldPosition.getZ() + 0.5;
-      serverLevel.playSound(null, this.worldPosition, SoundEvents.ENCHANTMENT_TABLE_USE,
-          SoundSource.BLOCKS, 0.6F, serverLevel.getRandom().nextFloat() * 0.1F + 0.9F);
+      serverLevel.playSound(null, this.worldPosition, SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.BLOCKS, 0.6F, serverLevel.getRandom().nextFloat() * 0.1F + 0.9F);
       serverLevel.sendParticles(ParticleTypes.ENCHANT, x, y, z, 8, 0.3, 0.2, 0.3, 0.1);
     }
   }
 
-  public static int computeXpCost() {
-    return ModConfig.get().experienceCost;
-  }
-
   @Override
   public boolean canTakeItemThroughFace(int i, ItemStack itemStack, Direction direction) {
-    if (this.mode != DisenchantMode.AUTO) return false;
-    if (i == 0) return !isValidInput(itemStack);
-    if (i == 2) return true;
-    return false;
+    if (this.mode != DisenchantMode.AUTO) {
+      return false;
+    }
+    if (i == 0) {
+      return !isValidInput(itemStack);
+    }
+    return i == 2;
   }
 
   public void toggleMode() {
-    if (this.mode == DisenchantMode.AUTO && !getItem(2).isEmpty()) return;
+    if (this.mode == DisenchantMode.AUTO && !getItem(2).isEmpty()) {
+      return;
+    }
     this.mode = this.mode.next();
     this.progress = 0;
     this.progressInput = ItemStack.EMPTY;
@@ -225,9 +244,15 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
   }
 
   public ItemStack getRenderedItemStack() {
-    if (!getItem(2).isEmpty()) return getItem(2);
-    if (!getItem(0).isEmpty()) return getItem(0);
-    if (!getItem(1).isEmpty()) return new ItemStack(Items.BOOK);
+    if (!getItem(2).isEmpty()) {
+      return getItem(2);
+    }
+    if (!getItem(0).isEmpty()) {
+      return getItem(0);
+    }
+    if (!getItem(1).isEmpty()) {
+      return new ItemStack(Items.BOOK);
+    }
     return ItemStack.EMPTY;
   }
 

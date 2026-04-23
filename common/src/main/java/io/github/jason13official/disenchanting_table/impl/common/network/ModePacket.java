@@ -7,13 +7,12 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 public record ModePacket() implements CustomPacketPayload {
 
-    public static final Type<ModePacket> TYPE = new Type<>(DisEnchantingTable.identifier("mode_toggle"));
+  public static final Type<ModePacket> TYPE = new Type<>(DisEnchantingTable.identifier("mode_toggle"));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ModePacket> STREAM_CODEC =
-        StreamCodec.unit(new ModePacket());
+  public static final StreamCodec<RegistryFriendlyByteBuf, ModePacket> STREAM_CODEC = StreamCodec.unit(new ModePacket());
 
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
+  @Override
+  public Type<? extends CustomPacketPayload> type() {
+    return TYPE;
+  }
 }

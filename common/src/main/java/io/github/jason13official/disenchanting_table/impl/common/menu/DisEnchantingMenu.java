@@ -127,6 +127,7 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
   }
 
   private static class InputSlot extends Slot {
+
     InputSlot(Container container, int slot, int x, int y) {
       super(container, slot, x, y);
     }
@@ -141,6 +142,7 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
   }
 
   private static class ExtraSlot extends Slot {
+
     ExtraSlot(Container container, int slot, int x, int y) {
       super(container, slot, x, y);
     }
@@ -152,6 +154,7 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
   }
 
   private static class OutputSlot extends Slot {
+
     private final DisEnchantingMenu menu;
 
     OutputSlot(Container container, int slot, int x, int y, DisEnchantingMenu menu) {
@@ -166,21 +169,16 @@ public class DisEnchantingMenu extends AbstractContainerMenu {
 
     @Override
     public boolean mayPickup(Player player) {
-      if (menu.container instanceof DisEnchantingTableTile tile
-          && tile.getMode() == DisenchantMode.MANUAL
-          && ModConfig.get().requiresExperience) {
+      if (menu.container instanceof DisEnchantingTableTile tile && tile.getMode() == DisenchantMode.MANUAL && ModConfig.get().requiresExperience) {
         int cost = DisEnchantingTableTile.computeXpCost();
-        return ModConfig.get().usesPoints
-            ? ExperienceHelper.hasEnoughExperiencePoints(player, cost)
-            : ExperienceHelper.hasEnoughExperienceLevels(player, cost);
+        return ModConfig.get().usesPoints ? ExperienceHelper.hasEnoughExperiencePoints(player, cost) : ExperienceHelper.hasEnoughExperienceLevels(player, cost);
       }
       return true;
     }
 
     @Override
     public void onTake(Player player, ItemStack stack) {
-      if (menu.container instanceof DisEnchantingTableTile tile
-          && tile.getMode() == DisenchantMode.MANUAL) {
+      if (menu.container instanceof DisEnchantingTableTile tile && tile.getMode() == DisenchantMode.MANUAL) {
         int cost = DisEnchantingTableTile.computeXpCost();
         if (ModConfig.get().requiresExperience) {
           if (ModConfig.get().usesPoints) {
