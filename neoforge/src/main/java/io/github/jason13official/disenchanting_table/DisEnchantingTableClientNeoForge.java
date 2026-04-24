@@ -10,11 +10,14 @@ import io.github.jason13official.disenchanting_table.impl.common.network.ModePac
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModMenus;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModTiles;
 import java.util.function.Consumer;
+import net.minecraft.client.Minecraft;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
@@ -36,11 +39,17 @@ public class DisEnchantingTableClientNeoForge {
 
     modEventBus.addListener((Consumer<RegisterPayloadHandlersEvent>) event -> {
       PayloadRegistrar registrar = event.registrar(Constants.MOD_ID);
-      registrar.playToServer(ConfigSyncS2CPacket.TYPE, ConfigSyncS2CPacket.STREAM_CODEC, (payload, context) -> {
+      registrar.playToClient(ConfigSyncS2CPacket.TYPE, ConfigSyncS2CPacket.STREAM_CODEC, (payload, context) -> {
         context.enqueueWork(() -> {
-          // TODO sync ModConfig values
+          ModConfig.get().sync(payload);
         });
       });
+    });
+
+    NeoForge.EVENT_BUS.addListener((Consumer<EntityLeaveLevelEvent>) event -> {
+      if (Minecraft.getInstance().player != null && event.getEntity() == Minecraft.getInstance().player) {
+        ModConfig.unsync();
+      }
     });
   }
 }

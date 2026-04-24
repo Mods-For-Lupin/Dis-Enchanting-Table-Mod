@@ -7,7 +7,9 @@ import io.github.jason13official.disenchanting_table.impl.common.network.ConfigS
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModMenus;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModTiles;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 
@@ -25,7 +27,13 @@ public class DisEnchantingTableClientFabric implements ClientModInitializer {
     MenuScreens.register(ModMenus.DISENCHANTING_TABLE, DisEnchantingScreen::new);
 
     ClientPlayNetworking.registerGlobalReceiver(ConfigSyncS2CPacket.TYPE, (payload, context) -> {
-      // TODO sync ModConfig values
+      ModConfig.get().sync(payload);
+    });
+
+    ClientEntityEvents.ENTITY_UNLOAD.register((entity, level) -> {
+      if (Minecraft.getInstance().player != null && entity == Minecraft.getInstance().player) {
+        ModConfig.unsync();
+      }
     });
   }
 }

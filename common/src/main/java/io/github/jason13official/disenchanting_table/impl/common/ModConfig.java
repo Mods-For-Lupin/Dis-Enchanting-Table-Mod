@@ -2,12 +2,15 @@ package io.github.jason13official.disenchanting_table.impl.common;
 
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import io.github.jason13official.disenchanting_table.Constants;
+import io.github.jason13official.disenchanting_table.impl.common.network.ConfigSyncS2CPacket;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ModConfig {
 
   private static ModConfig INSTANCE = new ModConfig();
+  private static final AtomicBoolean SYNCED_TO_REMOTE = new AtomicBoolean(false);
 
   public boolean automaticModeAllowed = true;
   public boolean requiresExperience = true;
@@ -20,7 +23,28 @@ public class ModConfig {
     return INSTANCE;
   }
 
+  public void sync(ConfigSyncS2CPacket packet) {
+    automaticModeAllowed = packet.automaticModeAllowed();
+    requiresExperience = packet.requiresExperience();
+    usesPoints = packet.usesPoints();
+    experienceCost = packet.experienceCost();
+    resetsRepairCost = packet.resetsRepairCost();
+    automaticDisenchantingTicks = packet.automaticDisenchantingTicks();
+
+    Constants.LOG.info("disenchanting_table received ConfigSyncS2CPacket");
+    SYNCED_TO_REMOTE.set(true);
+  }
+
+  public static void unsync() {
+    SYNCED_TO_REMOTE.set(false);
+  }
+
   public static void load(Path configDir) {
+
+    if (SYNCED_TO_REMOTE.get()) {
+      return;
+    }
+
     Path file = configDir.resolve("disenchanting_table-server.toml");
 
     try {
