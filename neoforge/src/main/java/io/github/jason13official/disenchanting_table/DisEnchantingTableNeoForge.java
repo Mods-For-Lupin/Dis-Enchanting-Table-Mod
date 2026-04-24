@@ -18,6 +18,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -28,6 +30,9 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import net.neoforged.neoforge.registries.RegisterEvent;
@@ -36,6 +41,8 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 public class DisEnchantingTableNeoForge {
 
   public static IEventBus EVENT_BUS;
+
+  private static MinecraftServer server;
 
   public DisEnchantingTableNeoForge(final IEventBus modEventBus) {
 
@@ -49,7 +56,10 @@ public class DisEnchantingTableNeoForge {
     bind(Registries.MENU, ModMenus::register);
     bind(Registries.CREATIVE_MODE_TAB, ModTabs::register);
 
-    EVENT_BUS.addListener((Consumer<FMLCommonSetupEvent>) event -> DisEnchantingTable.init());
+    EVENT_BUS.addListener((Consumer<FMLCommonSetupEvent>) event -> {
+      DisEnchantingTable.clientBoundPacketSender = PacketDistributor::sendToPlayer;
+      DisEnchantingTable.init();
+    });
 
     EVENT_BUS.addListener((Consumer<RegisterPayloadHandlersEvent>) event -> {
       PayloadRegistrar registrar = event.registrar(Constants.MOD_ID);
@@ -68,6 +78,16 @@ public class DisEnchantingTableNeoForge {
 
     NeoForge.EVENT_BUS.addListener((Consumer<AddServerReloadListenersEvent>) event -> {
       event.addListener(DisEnchantingTable.identifier(Constants.MOD_ID), new ResourceReloadListener());
+    });
+
+    NeoForge.EVENT_BUS.addListener((Consumer<EntityJoinLevelEvent>) event -> {
+      if (event.getEntity() instanceof ServerPlayer player) {
+        DisEnchantingTable.sendConfigSyncPacketToClient(player);
+      }
+    });
+
+    NeoForge.EVENT_BUS.addListener((Consumer<ServerStartedEvent>) event -> {
+      server = event.getServer();
     });
 
     if (FMLLoader.getCurrent().getDist() == Dist.CLIENT) {
@@ -94,6 +114,9 @@ public class DisEnchantingTableNeoForge {
     @Override
     protected void apply(Void unused, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
       ModConfig.load(Services.PLATFORM.getConfigDirectory());
+      if (server != null) {
+        server.getPlayerList().getPlayers().forEach(DisEnchantingTable::sendConfigSyncPacketToClient);
+      }
     }
 
     @Override

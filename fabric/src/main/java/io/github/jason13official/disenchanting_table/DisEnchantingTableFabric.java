@@ -3,6 +3,7 @@ package io.github.jason13official.disenchanting_table;
 import io.github.jason13official.disenchanting_table.impl.common.ModConfig;
 import io.github.jason13official.disenchanting_table.impl.common.menu.DisEnchantingMenu;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
+import io.github.jason13official.disenchanting_table.impl.common.network.ConfigSyncS2CPacket;
 import io.github.jason13official.disenchanting_table.platform.Services;
 import io.github.jason13official.disenchanting_table.impl.common.network.ModePacket;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModBlocks;
@@ -15,22 +16,30 @@ import io.github.jason13official.disenchanting_table.impl.common.registry.ModTil
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.resource.v1.DataResourceLoader;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 public class DisEnchantingTableFabric implements ModInitializer {
 
+  private static MinecraftServer server;
+
   @Override
   public void onInitialize() {
 
     Constants.LOG.info("DisEnchantingTableFabric#onInitialize");
+
+    DisEnchantingTable.clientBoundPacketSender = ServerPlayNetworking::send;
 
     bind(BuiltInRegistries.BLOCK, ModBlocks::register);
     bind(BuiltInRegistries.ENTITY_TYPE, ModEntities::register);
@@ -47,6 +56,7 @@ public class DisEnchantingTableFabric implements ModInitializer {
     Constants.LOG.info("DisEnchantingTableFabric config initialized.");
 
     PayloadTypeRegistry.serverboundPlay().register(ModePacket.TYPE, ModePacket.STREAM_CODEC);
+    PayloadTypeRegistry.clientboundPlay().register(ConfigSyncS2CPacket.TYPE, ConfigSyncS2CPacket.STREAM_CODEC);
     ServerPlayNetworking.registerGlobalReceiver(ModePacket.TYPE, (payload, context) -> {
       if (!ModConfig.get().automaticModeAllowed) {
         return;
@@ -60,6 +70,14 @@ public class DisEnchantingTableFabric implements ModInitializer {
     Constants.LOG.info("DisEnchantingTableFabric networking initialized.");
 
     DataResourceLoader.get().registerReloadListener(DisEnchantingTable.identifier(Constants.MOD_ID), new ResourceReloadListener());
+
+    ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+      if (entity instanceof ServerPlayer player) {
+        DisEnchantingTable.sendConfigSyncPacketToClient(player);
+      }
+    });
+
+    ServerLifecycleEvents.SERVER_STARTED.register(server -> DisEnchantingTableFabric.server = server);
 
     Constants.LOG.info("DisEnchantingTableFabric reload listener initialized.");
   }
@@ -79,6 +97,9 @@ public class DisEnchantingTableFabric implements ModInitializer {
     @Override
     protected void apply(Void unused, ResourceManager resourceManager, ProfilerFiller profilerFiller) {
       ModConfig.load(Services.PLATFORM.getConfigDirectory());
+      if (server != null) {
+        server.getPlayerList().getPlayers().forEach(DisEnchantingTable::sendConfigSyncPacketToClient);
+      }
     }
 
     @Override

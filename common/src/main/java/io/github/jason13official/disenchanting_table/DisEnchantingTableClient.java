@@ -10,15 +10,15 @@ import org.jspecify.annotations.Nullable;
 public class DisEnchantingTableClient {
 
   @Nullable
-  public static Consumer<CustomPacketPayload> packetSender;
+  public static Consumer<CustomPacketPayload> serverBoundPacketSender;
 
   public static void init() {
     ClientConfig.load(Services.PLATFORM.getConfigDirectory());
   }
 
-  public static void sendModePacket() {
-    if (packetSender != null) {
-      packetSender.accept(new ModePacket());
+  public static void sendModePacketToServer() {
+    if (serverBoundPacketSender != null) {
+      serverBoundPacketSender.accept(new ModePacket());
     }
   }
 }

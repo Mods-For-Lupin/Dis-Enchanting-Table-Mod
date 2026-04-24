@@ -82,7 +82,7 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
     double lowerX = xo + 86;
     double lowerY = yo + 7;
     if (button == 0 && (x >= lowerX && x < lowerX + 16) && (y >= lowerY && y < lowerY + 16)) {
-      DisEnchantingTableClient.sendModePacket();
+      DisEnchantingTableClient.sendModePacketToServer();
     }
 
     return super.mouseClicked(event, doubleClick);
