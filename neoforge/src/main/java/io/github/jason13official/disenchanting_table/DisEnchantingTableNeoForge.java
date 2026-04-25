@@ -4,6 +4,7 @@ import io.github.jason13official.disenchanting_table.impl.common.ModConfig;
 import io.github.jason13official.disenchanting_table.impl.common.menu.DisEnchantingMenu;
 import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
 import io.github.jason13official.disenchanting_table.platform.Services;
+import io.github.jason13official.disenchanting_table.impl.common.network.ConfigSyncS2CPacket;
 import io.github.jason13official.disenchanting_table.impl.common.network.ModePacket;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModBlocks;
 import io.github.jason13official.disenchanting_table.impl.common.registry.ModEntities;
@@ -74,6 +75,7 @@ public class DisEnchantingTableNeoForge {
           }
         });
       });
+      registrar.playToClient(ConfigSyncS2CPacket.TYPE, ConfigSyncS2CPacket.STREAM_CODEC);
     });
 
     NeoForge.EVENT_BUS.addListener((Consumer<AddServerReloadListenersEvent>) event -> {
