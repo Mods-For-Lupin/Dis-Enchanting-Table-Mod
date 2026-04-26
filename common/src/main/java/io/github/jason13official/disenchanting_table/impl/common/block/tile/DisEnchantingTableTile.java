@@ -77,6 +77,11 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
   }
 
   public static void tickServer(Level level, BlockPos blockPos, BlockState state, DisEnchantingTableTile tile) {
+
+    if (!ModConfig.get().automaticModeAllowed && tile.mode == DisenchantMode.AUTO) {
+      tile.toggleMode();
+    }
+
     if (tile.mode != DisenchantMode.AUTO) {
       return;
     }
@@ -261,7 +266,7 @@ public class DisEnchantingTableTile extends AbstractDisEnchantingTile implements
     super.loadAdditional(input);
     this.progress = input.getShortOr("Progress", (short) 0);
     this.maxProgress = input.getShortOr("MaxProgress", (short) DEFAULT_MAX_PROGRESS);
-    this.mode = DisenchantMode.fromInt(input.getByteOr("Mode", (byte) 0));
+    this.mode = ModConfig.get().automaticModeAllowed ? DisenchantMode.fromInt(input.getByteOr("Mode", (byte) 0)) : DisenchantMode.MANUAL;
   }
 
   @Override
