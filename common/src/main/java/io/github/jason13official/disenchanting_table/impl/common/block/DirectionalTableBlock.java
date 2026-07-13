@@ -1,8 +1,12 @@
 package io.github.jason13official.disenchanting_table.impl.common.block;
 
+import io.github.jason13official.disenchanting_table.impl.common.block.tile.DisEnchantingTableTile;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EnchantingTableBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -45,5 +49,16 @@ public abstract class DirectionalTableBlock extends HorizontalDirectionalBlock {
   @Override
   public BlockState getStateForPlacement(BlockPlaceContext context) {
     return this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+  }
+
+  @Override
+  public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+
+    if (!level.isClientSide() && level.getBlockEntity(pos) instanceof DisEnchantingTableTile tile) {
+
+      tile.setItem(2, ItemStack.EMPTY);
+    }
+
+    return super.playerWillDestroy(level, pos, state, player);
   }
 }

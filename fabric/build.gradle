@@ -1,11 +1,6 @@
 plugins {
     id 'multiloader-loader'
     id 'net.fabricmc.fabric-loom'
-    id 'com.gradleup.shadow'
-}
-
-configurations {
-    runtimeClasspath.extendsFrom(configurations.shadow)
 }
 
 dependencies {
@@ -13,19 +8,9 @@ dependencies {
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
 
-    shadow 'com.electronwill.night-config:toml:3.6.0'
-}
-
-tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-    configurations = project.configurations.named('shadow').map { [it] }
-
-    relocate 'com.electronwill.nightconfig', 'io.github.jason13official.disenchanting_table.shadow.nightconfig'
-    // archiveClassifier.set('')
-}
-
-jar {
-    dependsOn shadowJar
-    mustRunAfter shadowJar
+    implementation 'com.electronwill.night-config:toml:3.6.0'
+    include 'com.electronwill.night-config:core:3.6.0'
+    include 'com.electronwill.night-config:toml:3.6.0'
 }
 
 loom {
@@ -50,7 +35,6 @@ loom {
     mods {
         "disenchanting_table" {
             sourceSet sourceSets.main
-            configuration configurations.shadow
         }
     }
 }
