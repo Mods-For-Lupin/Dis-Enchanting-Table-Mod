@@ -118,7 +118,7 @@ public class DisEnchantingTableTile extends BaseContainerBlockEntity implements 
       ItemStack currentOutput = tile.getItem(OUTPUT_SLOT);
       if (!ItemStack.matches(currentOutput, expectedOutput)) {
         tile.items.set(OUTPUT_SLOT, expectedOutput);
-        tile.markUpdated();
+        tile.setChanged();
       }
     }
   }
@@ -153,7 +153,7 @@ public class DisEnchantingTableTile extends BaseContainerBlockEntity implements 
 
     tile.getItem(EXTRA_SLOT).shrink(1);
     tile.items.set(OUTPUT_SLOT, outputBook);
-    tile.markUpdated();
+    tile.setChanged();
   }
 
   /// called by the menu when the player takes from the output slot in manual mode;
@@ -168,7 +168,7 @@ public class DisEnchantingTableTile extends BaseContainerBlockEntity implements 
     if (input.is(Items.ENCHANTED_BOOK)) input.removeTagKey("StoredEnchantments");
     EnchantmentHelper.setEnchantments(enchants, input);
     tile.getItem(EXTRA_SLOT).shrink(1);
-    tile.markUpdated();
+    tile.setChanged();
   }
 
   @Override
@@ -276,12 +276,16 @@ public class DisEnchantingTableTile extends BaseContainerBlockEntity implements 
   public CompoundTag getUpdateTag() {
     CompoundTag tag = new CompoundTag();
     ContainerHelper.saveAllItems(tag, this.items, true);
+    tag.putInt("Mode", this.mode);
     return tag;
   }
 
-  private void markUpdated() {
-    this.setChanged();
-    this.getLevel().sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
+  @Override
+  public void setChanged() {
+    super.setChanged();
+    if (this.level != null && !this.level.isClientSide) {
+      this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), 3);
+    }
   }
 
   @Override
