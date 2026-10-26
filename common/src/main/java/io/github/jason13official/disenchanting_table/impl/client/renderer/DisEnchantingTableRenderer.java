@@ -50,8 +50,8 @@ public class DisEnchantingTableRenderer implements BlockEntityRenderer<DisEnchan
     poseStack.translate(0.5F, 0.75F, 0.5F);
     poseStack.scale(0.5F, 0.5F, 0.5F);
     Direction facing = Direction.from2DDataValue(state.facing.get2DDataValue() % 4);
-    poseStack.mulPose(Axis.YP.rotationDegrees(facing != Direction.EAST && facing != Direction.WEST ? facing.getOpposite().toYRot() : facing.toYRot()));
-    poseStack.mulPose(Axis.XP.rotationDegrees(90.0F));
+    poseStack.rotateDegrees(Axis.YP, facing != Direction.EAST && facing != Direction.WEST ? facing.getOpposite().toYRot() : facing.toYRot());
+    poseStack.rotateDegrees(Axis.XP, 90.0F);
     state.item.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
     poseStack.popPose();
   }

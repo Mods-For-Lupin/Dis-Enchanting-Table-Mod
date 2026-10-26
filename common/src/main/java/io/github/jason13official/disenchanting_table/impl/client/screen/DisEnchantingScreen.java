@@ -1,5 +1,6 @@
 package io.github.jason13official.disenchanting_table.impl.client.screen;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.jason13official.disenchanting_table.DisEnchantingTable;
 import io.github.jason13official.disenchanting_table.DisEnchantingTableClient;
 import io.github.jason13official.disenchanting_table.impl.client.ClientConfig;
@@ -81,7 +82,7 @@ public class DisEnchantingScreen extends AbstractContainerScreen<DisEnchantingMe
 
     double lowerX = xo + 86;
     double lowerY = yo + 7;
-    if (button == 0 && (x >= lowerX && x < lowerX + 16) && (y >= lowerY && y < lowerY + 16)) {
+    if (button == InputConstants.MOUSE_BUTTON_LEFT && (x >= lowerX && x < lowerX + 16) && (y >= lowerY && y < lowerY + 16)) {
       DisEnchantingTableClient.sendModePacketToServer();
     }
 
